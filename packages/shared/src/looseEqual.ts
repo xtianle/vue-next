@@ -1,5 +1,10 @@
 import { isArray, isDate, isObject } from './'
-
+/**
+ * 松散的比较数组
+ * @param a
+ * @param b
+ * @returns
+ */
 function looseCompareArrays(a: any[], b: any[]) {
   if (a.length !== b.length) return false
   let equal = true
@@ -8,7 +13,12 @@ function looseCompareArrays(a: any[], b: any[]) {
   }
   return equal
 }
-
+/**
+ * 松散相等
+ * @param a
+ * @param b
+ * @returns
+ */
 export function looseEqual(a: any, b: any): boolean {
   if (a === b) return true
   let aValidType = isDate(a)
@@ -47,7 +57,12 @@ export function looseEqual(a: any, b: any): boolean {
   }
   return String(a) === String(b)
 }
-
+/**
+ * 松散查找
+ * @param arr
+ * @param val
+ * @returns
+ */
 export function looseIndexOf(arr: any[], val: any): number {
   return arr.findIndex(item => looseEqual(item, val))
 }

@@ -9,6 +9,7 @@ import {
 } from './index'
 
 /**
+ * 用于将{{插值}}值转换为显示的字符串。
  * For converting {{ interpolation }} values to displayed strings.
  * @private
  */
@@ -21,7 +22,12 @@ export const toDisplayString = (val: unknown): string => {
     ? JSON.stringify(val, replacer, 2)
     : String(val)
 }
-
+/**
+ * 提代者
+ * @param _key 
+ * @param val 
+ * @returns 
+ */
 const replacer = (_key: string, val: any): any => {
   // can't use isRef here since @vue/shared has no deps
   if (val && val.__v_isRef) {

@@ -6,13 +6,16 @@ import { CollectionTypes } from './collectionHandlers'
 import { createDep, Dep } from './dep'
 
 declare const RefSymbol: unique symbol
-
+// ref 的接口
 export interface Ref<T = any> {
   value: T
   /**
    * Type differentiator only.
    * We need this to be in public d.ts but don't want it to show up in IDE
    * autocomplete, so we use a private Symbol instead.
+      * 仅限类型区分器。
+   * 我们需要它出现在公共的d.t中，但不希望它出现在IDE中
+   * 自动完成，所以我们用一个私有符号代替。
    */
   [RefSymbol]: true
   /**
@@ -67,14 +70,14 @@ export function isRef<T>(r: Ref<T> | unknown): r is Ref<T>
 export function isRef(r: any): r is Ref {
   return Boolean(r && r.__v_isRef === true)
 }
-
+// ref 重载
 export function ref<T extends object>(value: T): ToRef<T>
 export function ref<T>(value: T): Ref<UnwrapRef<T>>
 export function ref<T = any>(): Ref<T | undefined>
 export function ref(value?: unknown) {
   return createRef(value, false)
 }
-
+// shallowRef 重载
 export function shallowRef<T extends object>(
   value: T
 ): T extends Ref ? T : Ref<T>
@@ -83,7 +86,7 @@ export function shallowRef<T = any>(): Ref<T | undefined>
 export function shallowRef(value?: unknown) {
   return createRef(value, true)
 }
-
+// 填充
 class RefImpl<T> {
   private _value: T
   private _rawValue: T
@@ -110,22 +113,31 @@ class RefImpl<T> {
     }
   }
 }
-
+/**
+ * 创建ref
+ * @param rawValue
+ * @param shallow
+ * @returns
+ */
 function createRef(rawValue: unknown, shallow: boolean) {
   if (isRef(rawValue)) {
     return rawValue
   }
   return new RefImpl(rawValue, shallow)
 }
-
+// 触发反应
 export function triggerRef(ref: Ref) {
   triggerRefValue(ref, __DEV__ ? ref.value : void 0)
 }
-
+/**
+ * 获取ref中的值  如果是ref返回ref.value 否则返回参数本身
+ * @param ref
+ * @returns
+ */
 export function unref<T>(ref: T | Ref<T>): T {
   return isRef(ref) ? (ref.value as any) : ref
 }
-
+// 浅展开处理程序 ?
 const shallowUnwrapHandlers: ProxyHandler<any> = {
   get: (target, key, receiver) => unref(Reflect.get(target, key, receiver)),
   set: (target, key, value, receiver) => {
@@ -146,7 +158,9 @@ export function proxyRefs<T extends object>(
     ? objectWithRefs
     : new Proxy(objectWithRefs, shallowUnwrapHandlers)
 }
-
+/**
+ * 自定义填充模板？
+ */
 type CustomRefFactory<T> = (
   track: () => void,
   trigger: () => void
@@ -184,7 +198,12 @@ class CustomRefImpl<T> {
 export function customRef<T>(factory: CustomRefFactory<T>): Ref<T> {
   return new CustomRefImpl(factory) as any
 }
-
+/**
+ * 将响应式对象转化为普通对象
+ * 该普通对象都指向原始对象相应的属性的ref
+ * @param object 
+ * @returns 
+ */
 export type ToRefs<T = any> = {
   // #2687: somehow using ToRef<T[K]> here turns the resulting type into
   // a union of multiple Ref<*> types instead of a single Ref<* | *> type.
@@ -200,7 +219,9 @@ export function toRefs<T extends object>(object: T): ToRefs<T> {
   }
   return ret
 }
-
+/**
+ * 对象填充
+ */
 class ObjectRefImpl<T extends object, K extends keyof T> {
   public readonly __v_isRef = true
 
@@ -214,7 +235,12 @@ class ObjectRefImpl<T extends object, K extends keyof T> {
     this._object[this._key] = newVal
   }
 }
-
+/**
+ * 为响应式对象上的某个属性创建一个ref
+ * @param object 
+ * @param key 
+ * @returns 
+ */
 export type ToRef<T> = [T] extends [Ref] ? T : Ref<UnwrapRef<T>>
 export function toRef<T extends object, K extends keyof T>(
   object: T,

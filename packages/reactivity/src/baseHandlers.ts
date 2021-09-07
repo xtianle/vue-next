@@ -28,7 +28,7 @@ import {
   makeMap
 } from '@vue/shared'
 import { isRef } from './ref'
-
+// 是不可追踪的钥匙
 const isNonTrackableKeys = /*#__PURE__*/ makeMap(`__proto__,__v_isRef,__isVue`)
 
 const builtInSymbols = new Set(
@@ -47,6 +47,7 @@ const arrayInstrumentations = /*#__PURE__*/ createArrayInstrumentations()
 function createArrayInstrumentations() {
   const instrumentations: Record<string, Function> = {}
   // instrument identity-sensitive Array methods to account for possible reactive
+  // 仪器识别敏感阵列方法，以说明可能的反应
   // values
   ;(['includes', 'indexOf', 'lastIndexOf'] as const).forEach(key => {
     instrumentations[key] = function (this: unknown[], ...args: unknown[]) {
@@ -55,9 +56,11 @@ function createArrayInstrumentations() {
         track(arr, TrackOpTypes.GET, i + '')
       }
       // we run the method using the original args first (which may be reactive)
+      // 我们首先使用原始参数运行该方法（可能是被动的）
       const res = arr[key](...args)
       if (res === -1 || res === false) {
         // if that didn't work, run it again using raw values.
+              // 如果不起作用，请使用原始值再次运行它。
         return arr[key](...args.map(toRaw))
       } else {
         return res
@@ -76,7 +79,12 @@ function createArrayInstrumentations() {
   })
   return instrumentations
 }
-
+/**
+ * 创建getter
+ * @param isReadonly 是否只读 
+ * @param shallow 
+ * @returns 
+ */
 function createGetter(isReadonly = false, shallow = false) {
   return function get(target: Target, key: string | symbol, receiver: object) {
     if (key === ReactiveFlags.IS_REACTIVE) {

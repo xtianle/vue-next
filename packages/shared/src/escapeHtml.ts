@@ -1,5 +1,9 @@
 const escapeRE = /["'&<>]/
-
+/**
+ * 转义html 字符
+ * @param string 需要转义的字符
+ * @returns
+ */
 export function escapeHtml(string: unknown) {
   const str = '' + string
   const match = escapeRE.exec(str)
@@ -46,7 +50,7 @@ export function escapeHtml(string: unknown) {
 
 // https://www.w3.org/TR/html52/syntax.html#comments
 const commentStripRE = /^-?>|<!--|-->|--!>|<!-$/g
-
+// 转义html 注释
 export function escapeHtmlComment(src: string): string {
   return src.replace(commentStripRE, '')
 }

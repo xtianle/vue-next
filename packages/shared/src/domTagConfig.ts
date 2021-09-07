@@ -1,8 +1,11 @@
 // These tag configs are shared between compiler-dom and runtime-dom, so they
 // must be extracted in shared to avoid creating a dependency between the two.
+// 这些标记配置在编译器dom和运行时dom之间共享，因此
+// 必须在共享中提取，以避免在两者之间创建依赖关系。
 import { makeMap } from './makeMap'
 
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Element
+// html标记
 const HTML_TAGS =
   'html,body,base,head,link,meta,style,title,address,article,aside,footer,' +
   'header,h1,h2,h3,h4,h5,h6,nav,section,div,dd,dl,dt,figcaption,' +
@@ -15,6 +18,7 @@ const HTML_TAGS =
   'summary,template,blockquote,iframe,tfoot'
 
 // https://developer.mozilla.org/en-US/docs/Web/SVG/Element
+// svg标记
 const SVG_TAGS =
   'svg,animate,animateMotion,animateTransform,circle,clipPath,color-profile,' +
   'defs,desc,discard,ellipse,feBlend,feColorMatrix,feComponentTransfer,' +
@@ -26,10 +30,10 @@ const SVG_TAGS =
   'mesh,meshgradient,meshpatch,meshrow,metadata,mpath,path,pattern,' +
   'polygon,polyline,radialGradient,rect,set,solidcolor,stop,switch,symbol,' +
   'text,textPath,title,tspan,unknown,use,view'
-
+// 无效标记
 const VOID_TAGS =
   'area,base,br,col,embed,hr,img,input,link,meta,param,source,track,wbr'
-
+// 创建判断函数
 export const isHTMLTag = /*#__PURE__*/ makeMap(HTML_TAGS)
 export const isSVGTag = /*#__PURE__*/ makeMap(SVG_TAGS)
 export const isVoidTag = /*#__PURE__*/ makeMap(VOID_TAGS)

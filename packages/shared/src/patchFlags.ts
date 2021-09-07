@@ -19,11 +19,13 @@
 export const enum PatchFlags {
   /**
    * Indicates an element with dynamic textContent (children fast path)
+   *  指示具有动态textContent的元素（子快速路径）
    */
   TEXT = 1,
 
   /**
    * Indicates an element with dynamic class binding.
+   * 指示具有动态类绑定的元素。
    */
   CLASS = 1 << 1,
 
@@ -34,6 +36,13 @@ export const enum PatchFlags {
    * e.g. style="color: red" and :style="{ color: 'red' }" both get hoisted as
    *   const style = { color: 'red' }
    *   render() { return e('div', { style }) }
+   * 
+   * 指示具有动态样式的元素
+   * 编译器将静态字符串样式预编译为静态对象
+   * +检测并提升内联静态物体
+   * 例如：style=“color:red”和：style=“{color:'red'}”都会作为
+   * const style={color:'red'}
+   * render（）{return e（'div'，{style}）} 
    */
   STYLE = 1 << 2,
 
@@ -115,6 +124,12 @@ export const enum PatchFlags {
    * when encountering non-compiler generated slots (i.e. manually written
    * render functions, which should always be fully diffed)
    * OR manually cloneVNodes
+   * 
+   * 一个特殊的标志，指示扩散算法应该退出
+   * 优化模式。例如，在renderSlot（）创建的块片段上
+   * 遇到非编译器生成的插槽时（即手动写入
+   * 渲染函数，应始终完全不同）
+   * 或手动关闭节点 
    */
   BAIL = -2
 }

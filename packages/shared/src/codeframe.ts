@@ -1,5 +1,11 @@
 const range: number = 2
-
+/**
+ * 生成代码框架
+ * @param source 
+ * @param start 
+ * @param end 
+ * @returns 
+ */
 export function generateCodeFrame(
   source: string,
   start = 0,

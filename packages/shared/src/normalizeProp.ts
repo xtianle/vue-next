@@ -2,7 +2,11 @@ import { isArray, isString, isObject, hyphenate } from './'
 import { isNoUnitNumericStyleProp } from './domAttrConfig'
 
 export type NormalizedStyle = Record<string, string | number>
-
+/**
+ * 规范化样式
+ * @param value 
+ * @returns 
+ */
 export function normalizeStyle(
   value: unknown
 ): NormalizedStyle | string | undefined {
@@ -29,7 +33,11 @@ export function normalizeStyle(
 
 const listDelimiterRE = /;(?![^(]*\))/g
 const propertyDelimiterRE = /:(.+)/
-
+/**
+ * 解析字符串样式
+ * @param cssText 
+ * @returns 
+ */
 export function parseStringStyle(cssText: string): NormalizedStyle {
   const ret: NormalizedStyle = {}
   cssText.split(listDelimiterRE).forEach(item => {
@@ -40,7 +48,11 @@ export function parseStringStyle(cssText: string): NormalizedStyle {
   })
   return ret
 }
-
+/**
+ * 字符传化样式
+ * @param styles 
+ * @returns 
+ */
 export function stringifyStyle(
   styles: NormalizedStyle | string | undefined
 ): string {
@@ -61,7 +73,11 @@ export function stringifyStyle(
   }
   return ret
 }
-
+/**
+ * 规范化class
+ * @param value 
+ * @returns 
+ */
 export function normalizeClass(value: unknown): string {
   let res = ''
   if (isString(value)) {
