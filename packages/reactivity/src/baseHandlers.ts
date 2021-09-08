@@ -43,7 +43,7 @@ const readonlyGet = /*#__PURE__*/ createGetter(true)
 const shallowReadonlyGet = /*#__PURE__*/ createGetter(true, true)
 
 const arrayInstrumentations = /*#__PURE__*/ createArrayInstrumentations()
-
+// 创建数组
 function createArrayInstrumentations() {
   const instrumentations: Record<string, Function> = {}
   // instrument identity-sensitive Array methods to account for possible reactive
@@ -82,15 +82,23 @@ function createArrayInstrumentations() {
 /**
  * 创建getter
  * @param isReadonly 是否只读 
- * @param shallow 
+ * @param shallow 弱监听
  * @returns 
  */
 function createGetter(isReadonly = false, shallow = false) {
+  /**
+   * target 目标对象
+   * key 被获取的属性名
+   * receiver Proxy或者继承Proxy的对象
+   */
   return function get(target: Target, key: string | symbol, receiver: object) {
+    // 是否是响应的
     if (key === ReactiveFlags.IS_REACTIVE) {
       return !isReadonly
+      // 是否只读的
     } else if (key === ReactiveFlags.IS_READONLY) {
       return isReadonly
+      // 返回原始数据
     } else if (
       key === ReactiveFlags.RAW &&
       receiver ===
@@ -105,37 +113,40 @@ function createGetter(isReadonly = false, shallow = false) {
     ) {
       return target
     }
-
+    // 目标是数组
     const targetIsArray = isArray(target)
-
+    // 非只读  目标是数组 有对应的方法
     if (!isReadonly && targetIsArray && hasOwn(arrayInstrumentations, key)) {
       return Reflect.get(arrayInstrumentations, key, receiver)
     }
-
+    // 结果
     const res = Reflect.get(target, key, receiver)
-
+    // 是符号  有内置的符号  不可追踪的key
     if (isSymbol(key) ? builtInSymbols.has(key) : isNonTrackableKeys(key)) {
       return res
     }
-
+    // 非只读的
     if (!isReadonly) {
       track(target, TrackOpTypes.GET, key)
     }
-
+    // 浅
     if (shallow) {
       return res
     }
-
+    // 是否 ref
     if (isRef(res)) {
       // ref unwrapping - does not apply for Array + integer key.
       const shouldUnwrap = !targetIsArray || !isIntegerKey(key)
       return shouldUnwrap ? res.value : res
     }
-
+    // 是对象 
     if (isObject(res)) {
       // Convert returned value into a proxy as well. we do the isObject check
       // here to avoid invalid value warning. Also need to lazy access readonly
       // and reactive here to avoid circular dependency.
+      //将返回值也转换为代理。我们做等距检查
+      //这里避免出现无效值警告。还需要以只读方式访问
+      //这里是被动的，以避免循环依赖。
       return isReadonly ? readonly(res) : reactive(res)
     }
 
@@ -147,30 +158,43 @@ const set = /*#__PURE__*/ createSetter()
 const shallowSet = /*#__PURE__*/ createSetter(true)
 
 function createSetter(shallow = false) {
+  /**
+   * target 目标对象
+   * key 被获取的属性名
+   * value 新值
+   * receiver Proxy或者继承Proxy的对象
+   */
   return function set(
     target: object,
     key: string | symbol,
     value: unknown,
     receiver: object
   ): boolean {
+    // 旧值
     let oldValue = (target as any)[key]
+    // 非浅模式
     if (!shallow) {
+      // 获取原始值
       value = toRaw(value)
       oldValue = toRaw(oldValue)
+      // 
       if (!isArray(target) && isRef(oldValue) && !isRef(value)) {
         oldValue.value = value
         return true
       }
     } else {
       // in shallow mode, objects are set as-is regardless of reactive or not
+      // 在浅层模式下，无论是否反应，对象都按原样设置
     }
 
     const hadKey =
       isArray(target) && isIntegerKey(key)
         ? Number(key) < target.length
         : hasOwn(target, key)
+
     const result = Reflect.set(target, key, value, receiver)
     // don't trigger if target is something up in the prototype chain of original
+    // 如果目标是原始的原型链中的某个东西，则不会触发
     if (target === toRaw(receiver)) {
       if (!hadKey) {
         trigger(target, TriggerOpTypes.ADD, key, value)
@@ -181,7 +205,12 @@ function createSetter(shallow = false) {
     return result
   }
 }
-
+/**
+ * 删除属性
+ * @param target 
+ * @param key 
+ * @returns 
+ */
 function deleteProperty(target: object, key: string | symbol): boolean {
   const hadKey = hasOwn(target, key)
   const oldValue = (target as any)[key]
@@ -205,6 +234,9 @@ function ownKeys(target: object): (string | symbol)[] {
   return Reflect.ownKeys(target)
 }
 
+/**
+ * 可变的处理程序
+ */
 export const mutableHandlers: ProxyHandler<object> = {
   get,
   set,
