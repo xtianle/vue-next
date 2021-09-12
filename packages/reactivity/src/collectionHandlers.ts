@@ -17,9 +17,17 @@ type WeakCollections = WeakMap<any, any> | WeakSet<any>
 type MapTypes = Map<any, any> | WeakMap<any, any>
 type SetTypes = Set<any> | WeakSet<any>
 
+/**
+ * 转成 响应式数据
+ */
 const toReactive = <T extends unknown>(value: T): T =>
   isObject(value) ? reactive(value) : value
 
+/**
+ * 转成 只读数据
+ * @param value
+ * @returns
+ */
 const toReadonly = <T extends unknown>(value: T): T =>
   isObject(value) ? readonly(value as Record<any, any>) : value
 
