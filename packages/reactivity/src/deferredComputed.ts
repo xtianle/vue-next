@@ -3,9 +3,11 @@ import { ReactiveEffect } from './effect'
 import { ComputedGetter, ComputedRef } from './computed'
 import { ReactiveFlags, toRaw } from './reactive'
 import { trackRefValue, triggerRefValue } from './ref'
-
+//
 const tick = Promise.resolve()
+// 队列
 const queue: any[] = []
+// 等待
 let queued = false
 
 const scheduler = (fn: any) => {
@@ -23,16 +25,16 @@ const flush = () => {
   queue.length = 0
   queued = false
 }
-
+// 延迟计算引用
 class DeferredComputedRefImpl<T> {
   public dep?: Dep = undefined
 
-  private _value!: T
-  private _dirty = true
+  private _value!: T // 数据
+  private _dirty = true // 延迟
   public readonly effect: ReactiveEffect<T>
 
   public readonly __v_isRef = true
-  public readonly [ReactiveFlags.IS_READONLY] = true
+  public readonly [ReactiveFlags.IS_READONLY] = true // 是只读的
 
   constructor(getter: ComputedGetter<T>) {
     let compareTarget: any
@@ -82,7 +84,11 @@ class DeferredComputedRefImpl<T> {
     return toRaw(this)._get()
   }
 }
-
+/**
+ * 延迟计算
+ * @param getter
+ * @returns
+ */
 export function deferredComputed<T>(getter: () => T): ComputedRef<T> {
   return new DeferredComputedRefImpl(getter) as any
 }

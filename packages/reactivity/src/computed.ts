@@ -10,19 +10,19 @@ export interface ComputedRef<T = any> extends WritableComputedRef<T> {
   readonly value: T
   [ComoutedRefSymbol]: true
 }
-
+// 可写的计算属性
 export interface WritableComputedRef<T> extends Ref<T> {
   readonly effect: ReactiveEffect<T>
 }
 
 export type ComputedGetter<T> = (...args: any[]) => T
 export type ComputedSetter<T> = (v: T) => void
-
+// 可写的计算属性选项
 export interface WritableComputedOptions<T> {
   get: ComputedGetter<T>
   set: ComputedSetter<T>
 }
-
+// 计算参考输入
 class ComputedRefImpl<T> {
   public dep?: Dep = undefined
 
@@ -62,7 +62,7 @@ class ComputedRefImpl<T> {
     this._setter(newValue)
   }
 }
-
+// 计算属性重载
 export function computed<T>(
   getter: ComputedGetter<T>,
   debugOptions?: DebuggerOptions

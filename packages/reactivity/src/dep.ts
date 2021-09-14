@@ -17,7 +17,11 @@ type TrackedMarkers = {
    */
   n: number
 }
-
+/**
+ * 创建dep
+ * @param effects
+ * @returns
+ */
 export const createDep = (effects?: ReactiveEffect[]): Dep => {
   const dep = new Set<ReactiveEffect>(effects) as Dep
   dep.w = 0

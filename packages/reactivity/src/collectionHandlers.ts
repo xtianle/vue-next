@@ -175,6 +175,7 @@ function createForEach(isReadonly: boolean, isShallow: boolean) {
   }
 }
 
+// 迭代接口
 interface Iterable {
   [Symbol.iterator](): Iterator
 }
@@ -182,12 +183,18 @@ interface Iterable {
 interface Iterator {
   next(value?: any): IterationResult
 }
-
+// 迭代结果
 interface IterationResult {
   value: any
   done: boolean
 }
-
+/**
+ * 创建迭代结果
+ * @param method  方法
+ * @param isReadonly 是否只读
+ * @param isShallow  是否浅层
+ * @returns
+ */
 function createIterableMethod(
   method: string | symbol,
   isReadonly: boolean,
@@ -231,7 +238,11 @@ function createIterableMethod(
     }
   }
 }
-
+/**
+ * 创建只读的方法
+ * @param type
+ * @returns
+ */
 function createReadonlyMethod(type: TriggerOpTypes): Function {
   return function (this: CollectionTypes, ...args: unknown[]) {
     if (__DEV__) {
