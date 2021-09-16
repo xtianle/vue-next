@@ -19,7 +19,10 @@ export class EffectScope {
    * removal
    */
   private index: number | undefined
-
+  /**
+   * 
+   * @param detached 独立的
+   */
   constructor(detached = false) {
     if (!detached && activeEffectScope) {
       this.parent = activeEffectScope
@@ -77,7 +80,11 @@ export class EffectScope {
     }
   }
 }
-
+/**
+ * 影响范围
+ * @param detached 
+ * @returns 
+ */
 export function effectScope(detached?: boolean) {
   return new EffectScope(detached)
 }

@@ -31,11 +31,22 @@ export const createDep = (effects?: ReactiveEffect[]): Dep => {
   dep.n = 0
   return dep
 }
-
+/**
+ * 被跟踪
+ * @param dep 
+ * @returns 
+ */
 export const wasTracked = (dep: Dep): boolean => (dep.w & trackOpBit) > 0
-
+/**
+ * 新跟踪
+ * @param dep 
+ * @returns 
+ */
 export const newTracked = (dep: Dep): boolean => (dep.n & trackOpBit) > 0
-
+/**
+ * 初始化dep标记
+ * @param param0 
+ */
 export const initDepMarkers = ({ deps }: ReactiveEffect) => {
   if (deps.length) {
     for (let i = 0; i < deps.length; i++) {
@@ -43,7 +54,10 @@ export const initDepMarkers = ({ deps }: ReactiveEffect) => {
     }
   }
 }
-
+/**
+ * 确定dep标记
+ * @param effect 
+ */
 export const finalizeDepMarkers = (effect: ReactiveEffect) => {
   const { deps } = effect
   if (deps.length) {
@@ -56,6 +70,7 @@ export const finalizeDepMarkers = (effect: ReactiveEffect) => {
         deps[ptr++] = dep
       }
       // clear bits
+      // 清除位置
       dep.w &= ~trackOpBit
       dep.n &= ~trackOpBit
     }

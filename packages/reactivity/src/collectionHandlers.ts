@@ -9,10 +9,11 @@ import {
   toRawType,
   isMap
 } from '@vue/shared'
-
+// 集合类型
 export type CollectionTypes = IterableCollections | WeakCollections
-
+// 迭代集合
 type IterableCollections = Map<any, any> | Set<any>
+// 弱集合
 type WeakCollections = WeakMap<any, any> | WeakSet<any>
 
 type MapTypes = Map<any, any> | WeakMap<any, any>
@@ -31,9 +32,17 @@ const toReactive = <T extends unknown>(value: T): T =>
  */
 const toReadonly = <T extends unknown>(value: T): T =>
   isObject(value) ? readonly(value as Record<any, any>) : value
-
+/**
+ * 转出浅层的
+ * @param value 
+ * @returns 
+ */
 const toShallow = <T extends unknown>(value: T): T => value
-
+/**
+ * 获取属性
+ * @param v 
+ * @returns 
+ */
 const getProto = <T extends CollectionTypes>(v: T): any =>
   Reflect.getPrototypeOf(v)
 
@@ -255,7 +264,10 @@ function createReadonlyMethod(type: TriggerOpTypes): Function {
     return type === TriggerOpTypes.DELETE ? false : this
   }
 }
-
+/**
+ * 创建
+ * @returns 
+ */
 function createInstrumentations() {
   const mutableInstrumentations: Record<string, Function> = {
     get(this: MapTypes, key: unknown) {
@@ -346,10 +358,10 @@ function createInstrumentations() {
   })
 
   return [
-    mutableInstrumentations,
-    readonlyInstrumentations,
-    shallowInstrumentations,
-    shallowReadonlyInstrumentations
+    mutableInstrumentations, /**可变的 */
+    readonlyInstrumentations, /**只读的 */
+    shallowInstrumentations, /**浅层的 */
+    shallowReadonlyInstrumentations /**浅层只读的 */
   ]
 }
 
@@ -408,7 +420,12 @@ export const shallowReadonlyCollectionHandlers: ProxyHandler<CollectionTypes> =
   {
     get: /*#__PURE__*/ createInstrumentationGetter(true, true)
   }
-
+/**
+ * 检查身份密钥
+ * @param target 
+ * @param has 
+ * @param key 
+ */
 function checkIdentityKeys(
   target: CollectionTypes,
   has: (key: unknown) => boolean,

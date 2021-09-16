@@ -3,16 +3,16 @@
 // 使用文字字符串而不是数字，以便更容易检查
 // 调试器事件
 
-// 轨道类型
+// 跟踪类型
 export const enum TrackOpTypes {
-  GET = 'get',
-  HAS = 'has',
-  ITERATE = 'iterate'
+  GET = 'get',        // 获取
+  HAS = 'has',        // 检查是否存在
+  ITERATE = 'iterate' // 迭代
 }
 // 触发器类型
 export const enum TriggerOpTypes {
-  SET = 'set',
-  ADD = 'add',
-  DELETE = 'delete',
-  CLEAR = 'clear'
+  SET = 'set',        // 设置
+  ADD = 'add',        // 添加
+  DELETE = 'delete',  // 删除
+  CLEAR = 'clear'     // 清除
 }

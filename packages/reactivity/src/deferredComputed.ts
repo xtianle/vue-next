@@ -3,13 +3,16 @@ import { ReactiveEffect } from './effect'
 import { ComputedGetter, ComputedRef } from './computed'
 import { ReactiveFlags, toRaw } from './reactive'
 import { trackRefValue, triggerRefValue } from './ref'
-//
+// 循环
 const tick = Promise.resolve()
 // 队列
 const queue: any[] = []
 // 等待
 let queued = false
-
+/**
+ * 调度程序
+ * @param fn 
+ */
 const scheduler = (fn: any) => {
   queue.push(fn)
   if (!queued) {
@@ -17,7 +20,9 @@ const scheduler = (fn: any) => {
     tick.then(flush)
   }
 }
-
+/**
+ * 调用
+ */
 const flush = () => {
   for (let i = 0; i < queue.length; i++) {
     queue[i]()

@@ -199,25 +199,25 @@
 │     │     │     ├── ssrVShow.spec.ts
 │     │     │     ├── utils.ts
 │     ├── global.d.ts
-│     ├── reactivity
+│     ├── reactivity        响应系统
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
 │     │     ├── package.json
 │     │     ├── README.md
 │     │     ├── src
-│     │     │     ├── baseHandlers.ts
-│     │     │     ├── collectionHandlers.ts
-│     │     │     ├── computed.ts
-│     │     │     ├── deferredComputed.ts
-│     │     │     ├── dep.ts
-│     │     │     ├── effect.ts
-│     │     │     ├── effectScope.ts
+│     │     │     ├── baseHandlers.ts   基础的处理程序
+│     │     │     ├── collectionHandlers.ts     集合的处理成功
+│     │     │     ├── computed.ts       计算属性
+│     │     │     ├── deferredComputed.ts   延迟计算属性
+│     │     │     ├── dep.ts    
+│     │     │     ├── effect.ts     影响
+│     │     │     ├── effectScope.ts    作用范围
 │     │     │     ├── index.ts
-│     │     │     ├── operations.ts
-│     │     │     ├── reactive.ts
+│     │     │     ├── operations.ts     操作
+│     │     │     ├── reactive.ts       响应的
 │     │     │     ├── ref.ts
-│     │     │     ├── warning.ts
+│     │     │     ├── warning.ts        警告
 │     │     ├── __tests__
 │     │     │     ├── collections
 │     │     │     │     ├── Map.spec.ts

@@ -207,7 +207,11 @@ class CustomRefImpl<T> {
     this._set(newVal)
   }
 }
-
+/**
+ * 自定义ref
+ * @param factory 工厂函数
+ * @returns 
+ */
 export function customRef<T>(factory: CustomRefFactory<T>): Ref<T> {
   return new CustomRefImpl(factory) as any
 }

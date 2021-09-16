@@ -37,13 +37,13 @@ export let trackOpBit = 1
  */
 // 最大标记
 const maxMarkerBits = 30
-
+// 影响的调度程序
 export type EffectScheduler = (...args: any[]) => any
-
+// 调试事件
 export type DebuggerEvent = {
   effect: ReactiveEffect
 } & DebuggerEventExtraInfo
-
+// 调试器事件外部信息
 export type DebuggerEventExtraInfo = {
   target: object
   type: TrackOpTypes | TriggerOpTypes
@@ -52,11 +52,13 @@ export type DebuggerEventExtraInfo = {
   oldValue?: any
   oldTarget?: Map<any, any> | Set<any>
 }
-
+// 影响堆
 const effectStack: ReactiveEffect[] = []
+// 活动的影响
 let activeEffect: ReactiveEffect | undefined
-
+// 迭代key
 export const ITERATE_KEY = Symbol(__DEV__ ? 'iterate' : '')
+// 映射键迭代键
 export const MAP_KEY_ITERATE_KEY = Symbol(__DEV__ ? 'Map key iterate' : '')
 
 /**
@@ -71,10 +73,17 @@ export class ReactiveEffect<T = any> {
   allowRecurse?: boolean //
   onStop?: () => void
   // dev only
+  // 仅适用于开发人员
   onTrack?: (event: DebuggerEvent) => void
   // dev only
+  // 仅适用于开发人员
   onTrigger?: (event: DebuggerEvent) => void
-
+  /**
+   * 
+   * @param fn 
+   * @param scheduler 调度程序
+   * @param scope  作用域
+   */
   constructor(
     public fn: () => T,
     public scheduler: EffectScheduler | null = null,
@@ -139,7 +148,7 @@ function cleanupEffect(effect: ReactiveEffect) {
   }
 }
 /**
- * debugger 选项
+ * 调试选项
  */
 export interface DebuggerOptions {
   onTrack?: (event: DebuggerEvent) => void
@@ -147,6 +156,11 @@ export interface DebuggerOptions {
 }
 /**
  * reactive 影响选项
+ * lazy?: boolean
+ * scheduler?: EffectScheduler
+ * scope?: EffectScope
+ * allowRecurse?: boolean
+ * onStop?: () => void
  */
 export interface ReactiveEffectOptions extends DebuggerOptions {
   lazy?: boolean
@@ -327,6 +341,7 @@ export function trigger(
     }
 
     // also run for iteration key on ADD | DELETE | Map.SET
+    // 在ADD | DELETE | Map.SET上运行迭代键
     switch (type) {
       case TriggerOpTypes.ADD:
         if (!isArray(target)) {
@@ -336,6 +351,7 @@ export function trigger(
           }
         } else if (isIntegerKey(key)) {
           // new index added to array -> length changes
+          // 新索引添加到数组->长度更改
           deps.push(depsMap.get('length'))
         }
         break
@@ -391,11 +407,13 @@ export function triggerEffects(
   debuggerEventExtraInfo?: DebuggerEventExtraInfo
 ) {
   // spread into array for stabilization
+  // 分散成阵列以稳定
   for (const effect of isArray(dep) ? dep : [...dep]) {
     if (effect !== activeEffect || effect.allowRecurse) {
       if (__DEV__ && effect.onTrigger) {
         effect.onTrigger(extend({ effect }, debuggerEventExtraInfo))
       }
+      // 有调度程序 执行调度程序
       if (effect.scheduler) {
         effect.scheduler()
       } else {

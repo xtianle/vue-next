@@ -69,6 +69,8 @@ function createArrayInstrumentations() {
   })
   // instrument length-altering mutation methods to avoid length being tracked
   // which leads to infinite loops in some cases (#2137)
+  // 仪器长度改变突变方法，避免长度被跟踪
+  // 在某些情况下会导致无限循环（#2137）
   ;(['push', 'pop', 'shift', 'unshift', 'splice'] as const).forEach(key => {
     instrumentations[key] = function (this: unknown[], ...args: unknown[]) {
       pauseTracking()
@@ -237,7 +239,7 @@ function ownKeys(target: object): (string | symbol)[] {
 }
 
 /**
- * 可变的处理程序
+ * 可变的处理器
  */
 export const mutableHandlers: ProxyHandler<object> = {
   get,
@@ -246,7 +248,9 @@ export const mutableHandlers: ProxyHandler<object> = {
   has,
   ownKeys
 }
-
+/**
+ * 只读处理程器
+ */
 export const readonlyHandlers: ProxyHandler<object> = {
   get: readonlyGet,
   set(target, key) {
@@ -268,7 +272,9 @@ export const readonlyHandlers: ProxyHandler<object> = {
     return true
   }
 }
-
+/**
+ * 浅层反应处理器
+ */
 export const shallowReactiveHandlers = /*#__PURE__*/ extend(
   {},
   mutableHandlers,
@@ -281,6 +287,11 @@ export const shallowReactiveHandlers = /*#__PURE__*/ extend(
 // Props handlers are special in the sense that it should not unwrap top-level
 // refs (in order to allow refs to be explicitly passed down), but should
 // retain the reactivity of the normal readonly object.
+// 道具处理程序是特殊的，因为它不应该打开顶层
+// REF（以便允许REF被显式传递），但应
+// 保持正常只读对象的反应性
+
+// 浅层只读处理器
 export const shallowReadonlyHandlers = /*#__PURE__*/ extend(
   {},
   readonlyHandlers,

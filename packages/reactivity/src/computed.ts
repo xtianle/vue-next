@@ -3,7 +3,7 @@ import { Ref, trackRefValue, triggerRefValue } from './ref'
 import { isFunction, NOOP } from '@vue/shared'
 import { ReactiveFlags, toRaw } from './reactive'
 import { Dep } from './dep'
-
+// 共形参考符号
 declare const ComoutedRefSymbol: unique symbol
 
 export interface ComputedRef<T = any> extends WritableComputedRef<T> {
