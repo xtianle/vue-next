@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+
+        class Parent {
+            _value = ''
+            constructor(value) {
+                this.value = value
+            }
+            get value() {
+                return this._value
+            }
+            set value(val) {
+                this._value = val
+            }
+        }
+        const pp = new Parent('1')
+        console.log(pp)
+        console.log(pp.value)
+        // pp.value = 2
+        // console.log(pp.value)
+    </script>
+</body>
+
+</html>

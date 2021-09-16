@@ -14,19 +14,28 @@ import {
 // Conceptually, it's easier to think of a dependency as a Dep class
 // which maintains a Set of subscribers, but we simply store them as
 // raw Sets to reduce memory overhead.
+// 存储{target->key->dep}连接的主要WeakMap。
+// 从概念上讲，更容易将依赖项视为Dep类
+// 它维护一组订阅者，但我们只是将它们存储为
+// 原始设置可以减少内存开销。
 type KeyToDepMap = Map<any, Dep>
 const targetMap = new WeakMap<any, KeyToDepMap>()
 
 // The number of effects currently being tracked recursively.
+// 当前递归跟踪的效果数
 let effectTrackDepth = 0
-
+// 跟踪操作的标记
 export let trackOpBit = 1
 
 /**
  * The bitwise track markers support at most 30 levels op recursion.
  * This value is chosen to enable modern JS engines to use a SMI on all platforms.
  * When recursion depth is greater, fall back to using a full cleanup.
+ * 按位轨迹标记最多支持30级递归。
+ * 选择此值是为了使现代JS引擎能够在所有平台上使用SMI。
+ * 当递归深度更大时，返回到使用完全清理。
  */
+// 最大标记
 const maxMarkerBits = 30
 
 export type EffectScheduler = (...args: any[]) => any
@@ -50,13 +59,16 @@ let activeEffect: ReactiveEffect | undefined
 export const ITERATE_KEY = Symbol(__DEV__ ? 'iterate' : '')
 export const MAP_KEY_ITERATE_KEY = Symbol(__DEV__ ? 'Map key iterate' : '')
 
+/**
+ * 响应数据改变后的影响
+ */
 export class ReactiveEffect<T = any> {
   active = true
   deps: Dep[] = []
 
   // can be attached after creation
-  computed?: boolean
-  allowRecurse?: boolean
+  computed?: boolean // 计算属性
+  allowRecurse?: boolean //
   onStop?: () => void
   // dev only
   onTrack?: (event: DebuggerEvent) => void
@@ -70,7 +82,7 @@ export class ReactiveEffect<T = any> {
   ) {
     recordEffectScope(this, scope)
   }
-
+  // 运行
   run() {
     if (!this.active) {
       return this.fn()
@@ -102,7 +114,7 @@ export class ReactiveEffect<T = any> {
       }
     }
   }
-
+  // 停止
   stop() {
     if (this.active) {
       cleanupEffect(this)
@@ -113,7 +125,10 @@ export class ReactiveEffect<T = any> {
     }
   }
 }
-
+/**
+ * 清理影响
+ * @param effect
+ */
 function cleanupEffect(effect: ReactiveEffect) {
   const { deps } = effect
   if (deps.length) {
@@ -123,12 +138,16 @@ function cleanupEffect(effect: ReactiveEffect) {
     deps.length = 0
   }
 }
-
+/**
+ * debugger 选项
+ */
 export interface DebuggerOptions {
   onTrack?: (event: DebuggerEvent) => void
   onTrigger?: (event: DebuggerEvent) => void
 }
-
+/**
+ * reactive 影响选项
+ */
 export interface ReactiveEffectOptions extends DebuggerOptions {
   lazy?: boolean
   scheduler?: EffectScheduler
@@ -136,12 +155,19 @@ export interface ReactiveEffectOptions extends DebuggerOptions {
   allowRecurse?: boolean
   onStop?: () => void
 }
-
+/**
+ * reactive 影响运行
+ */
 export interface ReactiveEffectRunner<T = any> {
   (): T
   effect: ReactiveEffect
 }
-
+/**
+ * 影响（副作用）
+ * @param fn
+ * @param options
+ * @returns
+ */
 export function effect<T = any>(
   fn: () => T,
   options?: ReactiveEffectOptions
@@ -166,25 +192,38 @@ export function effect<T = any>(
 export function stop(runner: ReactiveEffectRunner) {
   runner.effect.stop()
 }
-
+// 应该跟踪
 let shouldTrack = true
+// 跟踪堆
 const trackStack: boolean[] = []
-
+/**
+ * 暂停跟踪
+ */
 export function pauseTracking() {
   trackStack.push(shouldTrack)
   shouldTrack = false
 }
-
+/**
+ * 启动跟踪
+ */
 export function enableTracking() {
   trackStack.push(shouldTrack)
   shouldTrack = true
 }
-
+/**
+ * 重置跟踪
+ */
 export function resetTracking() {
   const last = trackStack.pop()
   shouldTrack = last === undefined ? true : last
 }
-
+/**
+ * 跟踪 收集依赖
+ * @param target 目标
+ * @param type 类型
+ * @param key key
+ * @returns
+ */
 export function track(target: object, type: TrackOpTypes, key: unknown) {
   if (!isTracking()) {
     return
@@ -204,11 +243,18 @@ export function track(target: object, type: TrackOpTypes, key: unknown) {
 
   trackEffects(dep, eventInfo)
 }
-
+/**
+ * 是否正在跟踪
+ * @returns
+ */
 export function isTracking() {
   return shouldTrack && activeEffect !== undefined
 }
-
+/**
+ * 跟踪影响  （收集副作用）
+ * @param dep
+ * @param debuggerEventExtraInfo
+ */
 export function trackEffects(
   dep: Dep,
   debuggerEventExtraInfo?: DebuggerEventExtraInfo
@@ -239,7 +285,16 @@ export function trackEffects(
     }
   }
 }
-
+/**
+ * 触发
+ * @param target
+ * @param type
+ * @param key
+ * @param newValue
+ * @param oldValue
+ * @param oldTarget
+ * @returns
+ */
 export function trigger(
   target: object,
   type: TriggerOpTypes,
@@ -326,7 +381,11 @@ export function trigger(
     }
   }
 }
-
+/**
+ * 触发影响（触发副作用）
+ * @param dep
+ * @param debuggerEventExtraInfo
+ */
 export function triggerEffects(
   dep: Dep | ReactiveEffect[],
   debuggerEventExtraInfo?: DebuggerEventExtraInfo

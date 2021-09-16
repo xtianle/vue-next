@@ -1,16 +1,19 @@
 import { ReactiveEffect } from './effect'
 import { warn } from './warning'
-
+// 活动的影响范围
 let activeEffectScope: EffectScope | undefined
+// 影响范围的堆栈
 const effectScopeStack: EffectScope[] = []
-
+/**
+ * 影响范围
+ */
 export class EffectScope {
-  active = true
-  effects: ReactiveEffect[] = []
-  cleanups: (() => void)[] = []
+  active = true // 是否是活动的
+  effects: ReactiveEffect[] = [] // 影响
+  cleanups: (() => void)[] = [] // 清理
 
-  parent: EffectScope | undefined
-  scopes: EffectScope[] | undefined
+  parent: EffectScope | undefined // 父级
+  scopes: EffectScope[] | undefined // 范围
   /**
    * track a child scope's index in its parent's scopes array for optimized
    * removal
@@ -39,21 +42,21 @@ export class EffectScope {
       warn(`cannot run an inactive effect scope.`)
     }
   }
-
+  // 把当前影响推入到影响堆里面
   on() {
     if (this.active) {
       effectScopeStack.push(this)
       activeEffectScope = this
     }
   }
-
+  // 把当前影响从影响堆中移出
   off() {
     if (this.active) {
       effectScopeStack.pop()
       activeEffectScope = effectScopeStack[effectScopeStack.length - 1]
     }
   }
-
+  // 停止
   stop(fromParent?: boolean) {
     if (this.active) {
       this.effects.forEach(e => e.stop())
@@ -78,7 +81,11 @@ export class EffectScope {
 export function effectScope(detached?: boolean) {
   return new EffectScope(detached)
 }
-
+/**
+ * 记录响应的范围
+ * @param effect
+ * @param scope
+ */
 export function recordEffectScope(
   effect: ReactiveEffect,
   scope?: EffectScope | null
@@ -88,11 +95,17 @@ export function recordEffectScope(
     scope.effects.push(effect)
   }
 }
-
+/**
+ * 获取当前的范围
+ * @returns
+ */
 export function getCurrentScope() {
   return activeEffectScope
 }
-
+/**
+ * 监听范围的处理
+ * @param fn
+ */
 export function onScopeDispose(fn: () => void) {
   if (activeEffectScope) {
     activeEffectScope.cleanups.push(fn)

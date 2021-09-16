@@ -13,7 +13,7 @@ export interface Ref<T = any> {
    * Type differentiator only.
    * We need this to be in public d.ts but don't want it to show up in IDE
    * autocomplete, so we use a private Symbol instead.
-      * 仅限类型区分器。
+   * 仅限类型区分器。
    * 我们需要它出现在公共的d.t中，但不希望它出现在IDE中
    * 自动完成，所以我们用一个私有符号代替。
    */
@@ -62,10 +62,17 @@ export function triggerRefValue(ref: RefBase<any>, newVal?: any) {
     }
   }
 }
-
+/**
+ * 转换
+ * @param val
+ * @returns
+ */
 const convert = <T extends unknown>(val: T): T =>
   isObject(val) ? reactive(val) : val
-
+/**
+ * 是否是 ref
+ * @param r
+ */
 export function isRef<T>(r: Ref<T> | unknown): r is Ref<T>
 export function isRef(r: any): r is Ref {
   return Boolean(r && r.__v_isRef === true)
@@ -86,24 +93,27 @@ export function shallowRef<T = any>(): Ref<T | undefined>
 export function shallowRef(value?: unknown) {
   return createRef(value, true)
 }
-// 填充
+// ref
 class RefImpl<T> {
-  private _value: T
-  private _rawValue: T
+  private _value: T // 代理的值
+  private _rawValue: T // 原始的值
 
-  public dep?: Dep = undefined
-  public readonly __v_isRef = true
+  public dep?: Dep = undefined // 消息中心
+  public readonly __v_isRef = true // 只读的  记录是否是ref的属性
 
   constructor(value: T, public readonly _shallow: boolean) {
+    // 如果是 浅层的 直接返回value  否则获取 原始值
     this._rawValue = _shallow ? value : toRaw(value)
+    // 如果是 浅层的 直接返回value  否则执行 转换
     this._value = _shallow ? value : convert(value)
   }
-
+  // value属性的获取器
   get value() {
+    //
     trackRefValue(this)
     return this._value
   }
-
+  // value属性的设置器
   set value(newVal) {
     newVal = this._shallow ? newVal : toRaw(newVal)
     if (hasChanged(newVal, this._rawValue)) {
@@ -169,6 +179,9 @@ type CustomRefFactory<T> = (
   set: (value: T) => void
 }
 
+/**
+ * 自定义ref
+ */
 class CustomRefImpl<T> {
   public dep?: Dep = undefined
 
@@ -201,8 +214,8 @@ export function customRef<T>(factory: CustomRefFactory<T>): Ref<T> {
 /**
  * 将响应式对象转化为普通对象
  * 该普通对象都指向原始对象相应的属性的ref
- * @param object 
- * @returns 
+ * @param object
+ * @returns
  */
 export type ToRefs<T = any> = {
   // #2687: somehow using ToRef<T[K]> here turns the resulting type into
@@ -237,9 +250,9 @@ class ObjectRefImpl<T extends object, K extends keyof T> {
 }
 /**
  * 为响应式对象上的某个属性创建一个ref
- * @param object 
- * @param key 
- * @returns 
+ * @param object
+ * @param key
+ * @returns
  */
 export type ToRef<T> = [T] extends [Ref] ? T : Ref<UnwrapRef<T>>
 export function toRef<T extends object, K extends keyof T>(

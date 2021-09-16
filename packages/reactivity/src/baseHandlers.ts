@@ -60,7 +60,7 @@ function createArrayInstrumentations() {
       const res = arr[key](...args)
       if (res === -1 || res === false) {
         // if that didn't work, run it again using raw values.
-              // 如果不起作用，请使用原始值再次运行它。
+        // 如果不起作用，请使用原始值再次运行它。
         return arr[key](...args.map(toRaw))
       } else {
         return res
@@ -80,10 +80,11 @@ function createArrayInstrumentations() {
   return instrumentations
 }
 /**
- * 创建getter
- * @param isReadonly 是否只读 
+ * 创建proxy 的 getter  当前函数为一个纯函数
+ * 当前函数为一个闭包  返回getter函数
+ * @param isReadonly 是否只读
  * @param shallow 弱监听
- * @returns 
+ * @returns
  */
 function createGetter(isReadonly = false, shallow = false) {
   /**
@@ -104,12 +105,13 @@ function createGetter(isReadonly = false, shallow = false) {
       receiver ===
         (isReadonly
           ? shallow
-            ? shallowReadonlyMap
-            : readonlyMap
+            ? shallowReadonlyMap /**只读的对象的map集合 */
+            : readonlyMap /**只读浅层的对象的map集合 */
           : shallow
-          ? shallowReactiveMap
+          ? shallowReactiveMap /**响应浅层的对象的map集合 */
           : reactiveMap
-        ).get(target)
+        ) /**响应的对象的map集合 */
+          .get(target) /**获取原始对象 */
     ) {
       return target
     }
@@ -139,7 +141,7 @@ function createGetter(isReadonly = false, shallow = false) {
       const shouldUnwrap = !targetIsArray || !isIntegerKey(key)
       return shouldUnwrap ? res.value : res
     }
-    // 是对象 
+    // 是对象
     if (isObject(res)) {
       // Convert returned value into a proxy as well. we do the isObject check
       // here to avoid invalid value warning. Also need to lazy access readonly
@@ -177,7 +179,7 @@ function createSetter(shallow = false) {
       // 获取原始值
       value = toRaw(value)
       oldValue = toRaw(oldValue)
-      // 
+      //
       if (!isArray(target) && isRef(oldValue) && !isRef(value)) {
         oldValue.value = value
         return true
@@ -207,9 +209,9 @@ function createSetter(shallow = false) {
 }
 /**
  * 删除属性
- * @param target 
- * @param key 
- * @returns 
+ * @param target
+ * @param key
+ * @returns
  */
 function deleteProperty(target: object, key: string | symbol): boolean {
   const hadKey = hasOwn(target, key)

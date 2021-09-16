@@ -6,14 +6,17 @@ export type Dep = Set<ReactiveEffect> & TrackedMarkers
  * wasTracked and newTracked maintain the status for several levels of effect
  * tracking recursion. One bit per level is used to define wheter the dependency
  * was/is tracked.
+ *
+ * wasTracked和newTracked在几个级别上保持状态
+ * 跟踪递归。每级一位用于定义依赖关系被跟踪。
  */
 type TrackedMarkers = {
   /**
-   * wasTracked
+   * wasTracked 被跟踪
    */
   w: number
   /**
-   * newTracked
+   * newTracked 新的跟踪
    */
   n: number
 }

@@ -1,4 +1,4 @@
-// 反应
+// 响应式
 export {
   ref,
   shallowRef,
@@ -16,7 +16,7 @@ export {
   ShallowUnwrapRef,
   RefUnwrapBailTypes
 } from './ref'
-
+// 响应式对象
 export {
   reactive,
   readonly,
@@ -41,6 +41,7 @@ export {
   ComputedSetter
 } from './computed'
 export { deferredComputed } from './deferredComputed'
+// effect 影响  （副作用）
 export {
   effect,
   stop,
@@ -58,10 +59,12 @@ export {
   DebuggerEvent,
   DebuggerEventExtraInfo
 } from './effect'
+// 影响范围（副作用范围）
 export {
   effectScope,
   EffectScope,
   getCurrentScope,
   onScopeDispose
 } from './effectScope'
+// 操作符
 export { TrackOpTypes, TriggerOpTypes } from './operations'
