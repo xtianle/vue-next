@@ -1,8 +1,10 @@
 // Core API ------------------------------------------------------------------
-
+// 核心api
+// 版本号
 export const version = __VERSION__
 export {
   // core
+  // 核心
   computed,
   reactive,
   ref,
@@ -25,6 +27,7 @@ export {
   markRaw,
   toRaw,
   // effect
+  // 影响 （副作用）
   effect,
   stop,
   ReactiveEffect,
@@ -40,6 +43,7 @@ export {
   watchPostEffect,
   watchSyncEffect
 } from './apiWatch'
+// 生命周期
 export {
   onBeforeMount,
   onMounted,
@@ -54,14 +58,19 @@ export {
   onErrorCaptured,
   onServerPrefetch
 } from './apiLifecycle'
+// 暴露 引入
 export { provide, inject } from './apiInject'
+//
 export { nextTick } from './scheduler'
+// 组件
 export { defineComponent } from './apiDefineComponent'
+// 异步组件
 export { defineAsyncComponent } from './apiAsyncComponent'
+// 异步组件
 export { useAttrs, useSlots } from './apiSetupHelpers'
 
 // <script setup> API ----------------------------------------------------------
-
+//
 export {
   // macros runtime, for typing and warnings only
   defineProps,

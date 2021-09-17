@@ -112,7 +112,9 @@ export interface FunctionalComponent<P = {}, E extends EmitsOptions = {}>
   inheritAttrs?: boolean
   displayName?: string
 }
-
+/**
+ * class 组件
+ */
 export interface ClassComponent {
   new (...args: any[]): ComponentPublicInstance<any, any, any, any, any>
   __vccOpts: ComponentOptions
