@@ -88,25 +88,36 @@ import { isCompatEnabled } from './compat/compatConfig'
 import { DeprecationTypes } from './compat/compatConfig'
 import { registerLegacyRef } from './compat/ref'
 
+/**
+ * 渲染器
+ */
 export interface Renderer<HostElement = RendererElement> {
   render: RootRenderFunction<HostElement>
   createApp: CreateAppFunction<HostElement>
 }
 
+/**
+ * 服务器端渲染后 在浏览器端呈现的渲染函数
+ */
 export interface HydrationRenderer extends Renderer<Element | ShadowRoot> {
   hydrate: RootHydrateFunction
 }
-
+/**
+ * 渲染函数
+ */
 export type RootRenderFunction<HostElement = RendererElement> = (
   vnode: VNode | null,
   container: HostElement,
   isSVG?: boolean
 ) => void
-
+/**
+ * 渲染器选项
+ */
 export interface RendererOptions<
   HostNode = RendererNode,
   HostElement = RendererElement
 > {
+  // 补丁prop
   patchProp(
     el: HostElement,
     key: string,
@@ -118,23 +129,36 @@ export interface RendererOptions<
     parentSuspense?: SuspenseBoundary | null,
     unmountChildren?: UnmountChildrenFn
   ): void
+  // 插入
   insert(el: HostNode, parent: HostElement, anchor?: HostNode | null): void
+  // 删除
   remove(el: HostNode): void
+  // 创建元素
   createElement(
     type: string,
     isSVG?: boolean,
     isCustomizedBuiltIn?: string,
     vnodeProps?: (VNodeProps & { [key: string]: any }) | null
   ): HostElement
+  // 创建文本
   createText(text: string): HostNode
+  // 创建注释
   createComment(text: string): HostNode
+  // 设置文本
   setText(node: HostNode, text: string): void
+  // 设置元素文本
   setElementText(node: HostElement, text: string): void
+  // 父级节点
   parentNode(node: HostNode): HostElement | null
+  // 下个兄都节点
   nextSibling(node: HostNode): HostNode | null
+  // 查询选择器
   querySelector?(selector: string): HostElement | null
+  // 设置作用域id
   setScopeId?(el: HostElement, id: string): void
+  // 克隆节点
   cloneNode?(node: HostNode): HostNode
+  // 插入静态内容
   insertStaticContent?(
     content: string,
     parent: HostElement,
@@ -147,6 +171,10 @@ export interface RendererOptions<
 // logic - they are never directly operated on and always passed to the node op
 // functions provided via options, so the internal constraint is really just
 // a generic object.
+// 渲染器节点在技术上可以是核心渲染器上下文中的任何对象
+// 逻辑-它们从不直接操作，总是传递给节点op
+// 通过选项提供的函数，因此内部约束实际上只是
+// 泛型对象。
 export interface RendererNode {
   [key: string]: any
 }
@@ -156,6 +184,9 @@ export interface RendererElement extends RendererNode {}
 // An object exposing the internals of a renderer, passed to tree-shakeable
 // features so that they can be decoupled from this file. Keys are shortened
 // to optimize bundle size.
+// 暴露渲染器内部的对象，传递给tree shakeable
+// 功能，以便可以将其与此文件解耦。钥匙被缩短了
+// 优化束大小。
 export interface RendererInternals<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -175,6 +206,9 @@ export interface RendererInternals<
 // These functions are created inside a closure and therefore their types cannot
 // be directly exported. In order to avoid maintaining function signatures in
 // two places, we declare them once here and use them inside the closure.
+/**
+ * 补丁函数
+ */
 type PatchFn = (
   n1: VNode | null, // null means this is a mount
   n2: VNode,
@@ -186,7 +220,9 @@ type PatchFn = (
   slotScopeIds?: string[] | null,
   optimized?: boolean
 ) => void
-
+/**
+ * 挂载子集函数
+ */
 type MountChildrenFn = (
   children: VNodeArrayChildren,
   container: RendererElement,
@@ -198,7 +234,9 @@ type MountChildrenFn = (
   optimized: boolean,
   start?: number
 ) => void
-
+/**
+ * 子集补丁
+ */
 type PatchChildrenFn = (
   n1: VNode | null,
   n2: VNode,
@@ -210,7 +248,9 @@ type PatchChildrenFn = (
   slotScopeIds: string[] | null,
   optimized: boolean
 ) => void
-
+/**
+ * 块的子集补丁
+ */
 type PatchBlockChildrenFn = (
   oldChildren: VNode[],
   newChildren: VNode[],
@@ -220,7 +260,9 @@ type PatchBlockChildrenFn = (
   isSVG: boolean,
   slotScopeIds: string[] | null
 ) => void
-
+/**
+ * 移动
+ */
 type MoveFn = (
   vnode: VNode,
   container: RendererElement,
@@ -228,9 +270,13 @@ type MoveFn = (
   type: MoveType,
   parentSuspense?: SuspenseBoundary | null
 ) => void
-
+/**
+ * 下一个
+ */
 type NextFn = (vnode: VNode) => RendererNode | null
-
+/**
+ * 卸载
+ */
 type UnmountFn = (
   vnode: VNode,
   parentComponent: ComponentInternalInstance | null,
@@ -238,9 +284,13 @@ type UnmountFn = (
   doRemove?: boolean,
   optimized?: boolean
 ) => void
-
+/**
+ * 删除
+ */
 type RemoveFn = (vnode: VNode) => void
-
+/**
+ * 卸载子集
+ */
 type UnmountChildrenFn = (
   children: VNode[],
   parentComponent: ComponentInternalInstance | null,
@@ -249,7 +299,9 @@ type UnmountChildrenFn = (
   optimized?: boolean,
   start?: number
 ) => void
-
+/**
+ * 挂载组件
+ */
 export type MountComponentFn = (
   initialVNode: VNode,
   container: RendererElement,
@@ -259,14 +311,18 @@ export type MountComponentFn = (
   isSVG: boolean,
   optimized: boolean
 ) => void
-
+/**
+ * 处理文本或注释
+ */
 type ProcessTextOrCommentFn = (
   n1: VNode | null,
   n2: VNode,
   container: RendererElement,
   anchor: RendererNode | null
 ) => void
-
+/**
+ * 设置渲染效果
+ */
 export type SetupRenderEffectFn = (
   instance: ComponentInternalInstance,
   initialVNode: VNode,
@@ -276,13 +332,17 @@ export type SetupRenderEffectFn = (
   isSVG: boolean,
   optimized: boolean
 ) => void
-
+/**
+ * MoveType 移动类型
+ */
 export const enum MoveType {
   ENTER,
   LEAVE,
   REORDER
 }
-
+/**
+ * 队列后期渲染效果
+ */
 export const queuePostRenderEffect = __FEATURE_SUSPENSE__
   ? queueEffectWithSuspense
   : queuePostFlushCb
@@ -302,6 +362,11 @@ export const queuePostRenderEffect = __FEATURE_SUSPENSE__
  * })
  * ```
  */
+/**
+ * 创建渲染器
+ * @param options
+ * @returns
+ */
 export function createRenderer<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -318,6 +383,10 @@ export function createHydrationRenderer(
   return baseCreateRenderer(options, createHydrationFunctions)
 }
 
+/**
+ * 创建基础渲染器
+ * @param options
+ */
 // overload 1: no hydration
 function baseCreateRenderer<
   HostNode = RendererNode,
@@ -364,6 +433,19 @@ function baseCreateRenderer(
 
   // Note: functions inside this closure should use `const xxx = () => {}`
   // style in order to prevent being inlined by minifiers.
+  /**
+   * 补丁
+   * @param n1
+   * @param n2
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   * @returns
+   */
   const patch: PatchFn = (
     n1,
     n2,
@@ -480,7 +562,13 @@ function baseCreateRenderer(
       setRef(ref, n1 && n1.ref, parentSuspense, n2 || n1, !n2)
     }
   }
-
+  /**
+   * 过程文本
+   * @param n1
+   * @param n2
+   * @param container
+   * @param anchor
+   */
   const processText: ProcessTextOrCommentFn = (n1, n2, container, anchor) => {
     if (n1 == null) {
       hostInsert(
@@ -495,7 +583,13 @@ function baseCreateRenderer(
       }
     }
   }
-
+  /**
+   * 过程注释节点
+   * @param n1
+   * @param n2
+   * @param container
+   * @param anchor
+   */
   const processCommentNode: ProcessTextOrCommentFn = (
     n1,
     n2,
@@ -513,7 +607,13 @@ function baseCreateRenderer(
       n2.el = n1.el
     }
   }
-
+  /**
+   * 挂载静态节点
+   * @param n2
+   * @param container
+   * @param anchor
+   * @param isSVG
+   */
   const mountStaticNode = (
     n2: VNode,
     container: RendererElement,
@@ -556,7 +656,12 @@ function baseCreateRenderer(
       n2.anchor = n1.anchor
     }
   }
-
+  /**
+   * 移动静态节点
+   * @param param0
+   * @param container
+   * @param nextSibling
+   */
   const moveStaticNode = (
     { el, anchor }: VNode,
     container: RendererElement,
@@ -570,7 +675,10 @@ function baseCreateRenderer(
     }
     hostInsert(anchor!, container, nextSibling)
   }
-
+  /**
+   * 删除静态节点
+   * @param param0
+   */
   const removeStaticNode = ({ el, anchor }: VNode) => {
     let next
     while (el && el !== anchor) {
@@ -580,7 +688,18 @@ function baseCreateRenderer(
     }
     hostRemove(anchor!)
   }
-
+  /**
+   * 元素过程
+   * @param n1
+   * @param n2
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   */
   const processElement = (
     n1: VNode | null,
     n2: VNode,
@@ -616,7 +735,17 @@ function baseCreateRenderer(
       )
     }
   }
-
+  /**
+   * 挂载元素
+   * @param vnode
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   */
   const mountElement = (
     vnode: VNode,
     container: RendererElement,
@@ -740,7 +869,14 @@ function baseCreateRenderer(
       }, parentSuspense)
     }
   }
-
+  /**
+   * 设置作用域id
+   * @param el
+   * @param vnode
+   * @param scopeId
+   * @param slotScopeIds
+   * @param parentComponent
+   */
   const setScopeId = (
     el: RendererElement,
     vnode: VNode,
@@ -778,7 +914,18 @@ function baseCreateRenderer(
       }
     }
   }
-
+  /**
+   * 挂载子集
+   * @param children
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   * @param start
+   */
   const mountChildren: MountChildrenFn = (
     children,
     container,
@@ -807,7 +954,16 @@ function baseCreateRenderer(
       )
     }
   }
-
+  /**
+   * 元素补丁
+   * @param n1
+   * @param n2
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   */
   const patchElement = (
     n1: VNode,
     n2: VNode,
@@ -960,6 +1116,17 @@ function baseCreateRenderer(
   }
 
   // The fast path for blocks.
+  // 块的快速路径。
+  /**
+   * 子集块补丁
+   * @param oldChildren
+   * @param newChildren
+   * @param fallbackContainer
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   */
   const patchBlockChildren: PatchBlockChildrenFn = (
     oldChildren,
     newChildren,
@@ -1002,7 +1169,16 @@ function baseCreateRenderer(
       )
     }
   }
-
+  /**
+   * props补丁
+   * @param el
+   * @param vnode
+   * @param oldProps
+   * @param newProps
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   */
   const patchProps = (
     el: RendererElement,
     vnode: VNode,
@@ -1055,7 +1231,18 @@ function baseCreateRenderer(
       }
     }
   }
-
+  /**
+   * 过程片段
+   * @param n1
+   * @param n2
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   */
   const processFragment = (
     n1: VNode | null,
     n2: VNode,
@@ -1153,7 +1340,18 @@ function baseCreateRenderer(
       }
     }
   }
-
+  /**
+   * 过程组件
+   * @param n1
+   * @param n2
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   */
   const processComponent = (
     n1: VNode | null,
     n2: VNode,
@@ -1190,7 +1388,17 @@ function baseCreateRenderer(
       updateComponent(n1, n2, optimized)
     }
   }
-
+  /**
+   * 挂载组件
+   * @param initialVNode
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param optimized
+   * @returns
+   */
   const mountComponent: MountComponentFn = (
     initialVNode,
     container,
@@ -1266,7 +1474,13 @@ function baseCreateRenderer(
       endMeasure(instance, `mount`)
     }
   }
-
+  /**
+   * 更新组件
+   * @param n1
+   * @param n2
+   * @param optimized
+   * @returns
+   */
   const updateComponent = (n1: VNode, n2: VNode, optimized: boolean) => {
     const instance = (n2.component = n1.component)!
     if (shouldUpdateComponent(n1, n2, optimized)) {
@@ -1301,7 +1515,16 @@ function baseCreateRenderer(
       instance.vnode = n2
     }
   }
-
+  /**
+   * 设置渲染效果
+   * @param instance
+   * @param initialVNode
+   * @param container
+   * @param anchor
+   * @param parentSuspense
+   * @param isSVG
+   * @param optimized
+   */
   const setupRenderEffect: SetupRenderEffectFn = (
     instance,
     initialVNode,
@@ -1596,7 +1819,19 @@ function baseCreateRenderer(
     flushPreFlushCbs(undefined, instance.update)
     resetTracking()
   }
-
+  /**
+   * 子集补丁
+   * @param n1
+   * @param n2
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   * @returns
+   */
   const patchChildren: PatchChildrenFn = (
     n1,
     n2,
@@ -1698,7 +1933,18 @@ function baseCreateRenderer(
       }
     }
   }
-
+  /**
+   *
+   * @param c1
+   * @param c2
+   * @param container
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   */
   const patchUnkeyedChildren = (
     c1: VNode[],
     c2: VNodeArrayChildren,
@@ -1998,7 +2244,9 @@ function baseCreateRenderer(
       }
     }
   }
-
+  /**
+   * 移动
+   */
   const move: MoveFn = (
     vnode,
     container,
@@ -2065,7 +2313,15 @@ function baseCreateRenderer(
       hostInsert(el!, container, anchor)
     }
   }
-
+  /**
+   * 卸载
+   * @param vnode
+   * @param parentComponent
+   * @param parentSuspense
+   * @param doRemove
+   * @param optimized
+   * @returns
+   */
   const unmount: UnmountFn = (
     vnode,
     parentComponent,
@@ -2165,7 +2421,11 @@ function baseCreateRenderer(
       }, parentSuspense)
     }
   }
-
+  /**
+   * 清除
+   * @param vnode
+   * @returns
+   */
   const remove: RemoveFn = vnode => {
     const { type, el, anchor, transition } = vnode
     if (type === Fragment) {
@@ -2201,7 +2461,11 @@ function baseCreateRenderer(
       performRemove()
     }
   }
-
+  /**
+   * 清除碎片
+   * @param cur
+   * @param end
+   */
   const removeFragment = (cur: RendererNode, end: RendererNode) => {
     // For fragments, directly remove all contained DOM nodes.
     // (fragment child nodes cannot have transition)
@@ -2213,7 +2477,12 @@ function baseCreateRenderer(
     }
     hostRemove(end)
   }
-
+  /**
+   * 卸载组件
+   * @param instance
+   * @param parentSuspense
+   * @param doRemove
+   */
   const unmountComponent = (
     instance: ComponentInternalInstance,
     parentSuspense: SuspenseBoundary | null,
@@ -2286,7 +2555,15 @@ function baseCreateRenderer(
       devtoolsComponentRemoved(instance)
     }
   }
-
+  /**
+   * 卸载子集
+   * @param children
+   * @param parentComponent
+   * @param parentSuspense
+   * @param doRemove
+   * @param optimized
+   * @param start
+   */
   const unmountChildren: UnmountChildrenFn = (
     children,
     parentComponent,
@@ -2299,7 +2576,11 @@ function baseCreateRenderer(
       unmount(children[i], parentComponent, parentSuspense, doRemove, optimized)
     }
   }
-
+  /**
+   * 获取下个主节点
+   * @param vnode
+   * @returns
+   */
   const getNextHostNode: NextFn = vnode => {
     if (vnode.shapeFlag & ShapeFlags.COMPONENT) {
       return getNextHostNode(vnode.component!.subTree)
@@ -2309,7 +2590,12 @@ function baseCreateRenderer(
     }
     return hostNextSibling((vnode.anchor || vnode.el)!)
   }
-
+  /**
+   * 渲染函数
+   * @param vnode
+   * @param container
+   * @param isSVG
+   */
   const render: RootRenderFunction = (vnode, container, isSVG) => {
     if (vnode == null) {
       if (container._vnode) {
@@ -2321,7 +2607,9 @@ function baseCreateRenderer(
     flushPostFlushCbs()
     container._vnode = vnode
   }
-
+  /**
+   * 渲染的内部构件
+   */
   const internals: RendererInternals = {
     p: patch,
     um: unmount,
@@ -2350,6 +2638,15 @@ function baseCreateRenderer(
   }
 }
 
+/**
+ * 设置ref
+ * @param rawRef 真实的ref
+ * @param oldRawRef 旧的ref
+ * @param parentSuspense 父级
+ * @param vnode 虚拟节点
+ * @param isUnmount 是否销毁
+ * @returns
+ */
 export function setRef(
   rawRef: VNodeNormalizedRef,
   oldRawRef: VNodeNormalizedRef | null,
@@ -2442,7 +2739,13 @@ export function setRef(
     warn('Invalid template ref type:', value, `(${typeof value})`)
   }
 }
-
+/**
+ * 调用虚拟节点的钩子
+ * @param hook 钩子
+ * @param instance 实例
+ * @param vnode 虚拟节点
+ * @param prevVNode 上个节点
+ */
 export function invokeVNodeHook(
   hook: VNodeHook,
   instance: ComponentInternalInstance | null,
@@ -2465,6 +2768,12 @@ export function invokeVNodeHook(
  * Inside keyed `template` fragment static children, if a fragment is moved,
  * the children will always moved so that need inherit el form previous nodes
  * to ensure correct moved position.
+ */
+/**
+ * 遍历静态子集
+ * @param n1 节点1
+ * @param n2 节点2
+ * @param shallow 是否是浅层
  */
 export function traverseStaticChildren(n1: VNode, n2: VNode, shallow = false) {
   const ch1 = n1.children
@@ -2492,6 +2801,11 @@ export function traverseStaticChildren(n1: VNode, n2: VNode, shallow = false) {
 }
 
 // https://en.wikipedia.org/wiki/Longest_increasing_subsequence
+/**
+ * 获取队列
+ * @param arr
+ * @returns
+ */
 function getSequence(arr: number[]): number[] {
   const p = arr.slice()
   const result = [0]

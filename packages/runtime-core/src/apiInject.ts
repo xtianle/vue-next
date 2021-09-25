@@ -2,9 +2,15 @@ import { isFunction } from '@vue/shared'
 import { currentInstance } from './component'
 import { currentRenderingInstance } from './componentRenderContext'
 import { warn } from './warning'
-
+/**
+ * 注入的key
+ */
 export interface InjectionKey<T> extends Symbol {}
-
+/**
+ * 提供
+ * @param key
+ * @param value
+ */
 export function provide<T>(key: InjectionKey<T> | string | number, value: T) {
   if (!currentInstance) {
     if (__DEV__) {
@@ -26,7 +32,9 @@ export function provide<T>(key: InjectionKey<T> | string | number, value: T) {
     provides[key as string] = value
   }
 }
-
+/**
+ * 注入
+ */
 export function inject<T>(key: InjectionKey<T> | string): T | undefined
 export function inject<T>(
   key: InjectionKey<T> | string,
@@ -50,6 +58,8 @@ export function inject(
     // #2400
     // to support `app.use` plugins,
     // fallback to appContext's `provides` if the intance is at root
+    // 要支持'app.use'插件，
+    // 如果intance位于根目录下，则回退到appContext的'provides
     const provides =
       instance.parent == null
         ? instance.vnode.appContext && instance.vnode.appContext.provides

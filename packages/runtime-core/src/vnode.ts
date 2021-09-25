@@ -97,11 +97,18 @@ export type VNodeProps = {
   ref?: VNodeRef
 
   // vnode hooks
+  // vnode 的钩子
+  // 挂载钱
   onVnodeBeforeMount?: VNodeMountHook | VNodeMountHook[]
+  // 挂载
   onVnodeMounted?: VNodeMountHook | VNodeMountHook[]
+  // 更新前
   onVnodeBeforeUpdate?: VNodeUpdateHook | VNodeUpdateHook[]
+  // 更新后
   onVnodeUpdated?: VNodeUpdateHook | VNodeUpdateHook[]
+  // 销户前
   onVnodeBeforeUnmount?: VNodeMountHook | VNodeMountHook[]
+  // 销户后
   onVnodeUnmounted?: VNodeMountHook | VNodeMountHook[]
 }
 // vnode子集 原子
@@ -196,6 +203,7 @@ export interface VNode<
   dynamicChildren: VNode[] | null
 
   // application root node only
+  // 应用唯一的根节点
   appContext: AppContext | null
 
   /**
@@ -418,14 +426,14 @@ const normalizeRef = ({ ref }: VNodeProps): VNodeNormalizedRefAtom | null => {
 
 /**
  * 创建基础节点
- * @param type
- * @param props
- * @param children
- * @param patchFlag
- * @param dynamicProps
- * @param shapeFlag
- * @param isBlockNode
- * @param needFullChildrenNormalization
+ * @param type 类型
+ * @param props props
+ * @param children 子集
+ * @param patchFlag 补丁标识
+ * @param dynamicProps 动态的props
+ * @param shapeFlag 形状标识
+ * @param isBlockNode 是否是块
+ * @param needFullChildrenNormalization 需要子集标准化
  * @returns
  */
 function createBaseVNode(
@@ -438,6 +446,7 @@ function createBaseVNode(
   isBlockNode = false,
   needFullChildrenNormalization = false
 ) {
+  // 虚拟节点
   const vnode = {
     __v_isVNode: true,
     __v_skip: true,
@@ -445,6 +454,7 @@ function createBaseVNode(
     props,
     key: props && normalizeKey(props),
     ref: props && normalizeRef(props),
+    // 作用域id
     scopeId: currentScopeId,
     slotScopeIds: null,
     children,
@@ -481,6 +491,7 @@ function createBaseVNode(
   }
 
   // validate key
+  // 验证key
   if (__DEV__ && vnode.key !== vnode.key) {
     warn(`VNode created with invalid key (NaN). VNode type:`, vnode.type)
   }
@@ -545,11 +556,12 @@ function _createVNode(
     }
     type = Comment
   }
-
+  // 是否是虚拟节点
   if (isVNode(type)) {
     // createVNode receiving an existing vnode. This happens in cases like
     // <component :is="vnode"/>
     // #2078 make sure to merge refs during the clone instead of overwriting it
+    // 克隆节点
     const cloned = cloneVNode(type, props, true /* mergeRef: true */)
     if (children) {
       normalizeChildren(cloned, children)
@@ -568,8 +580,10 @@ function _createVNode(
   }
 
   // class & style normalization.
+  // class样式 与 行内样式 标准化
   if (props) {
     // for reactive or proxy objects, we need to clone it to enable mutation.
+    // 对于反应对象或代理对象，我们需要克隆它以启用变异
     props = guardReactiveProps(props)!
     let { class: klass, style } = props
     if (klass && !isString(klass)) {
@@ -586,6 +600,7 @@ function _createVNode(
   }
 
   // encode the vnode type information into a bitmap
+  // 将vnode类型信息编码为位图
   const shapeFlag = isString(type)
     ? ShapeFlags.ELEMENT
     : __FEATURE_SUSPENSE__ && isSuspense(type)
@@ -635,10 +650,10 @@ export function guardReactiveProps(props: (Data & VNodeProps) | null) {
 }
 
 /**
- * 可怜节点
- * @param vnode
- * @param extraProps
- * @param mergeRef
+ * 克隆节点
+ * @param vnode 节点
+ * @param extraProps 额外的props
+ * @param mergeRef 合并的ref
  * @returns
  */
 export function cloneVNode<T, U>(
@@ -648,13 +663,17 @@ export function cloneVNode<T, U>(
 ): VNode<T, U> {
   // This is intentionally NOT using spread or extend to avoid the runtime
   // key enumeration cost.
+  // 这是有意不使用spread或extend来避免运行时
+  // 关键枚举成本。
   const { props, ref, patchFlag, children } = vnode
+  // 合并props
   const mergedProps = extraProps ? mergeProps(props || {}, extraProps) : props
+  // 克隆的节点
   const cloned: VNode = {
     __v_isVNode: true,
     __v_skip: true,
     type: vnode.type,
-    props: mergedProps,
+    props: mergedProps, // 合并后的props
     key: mergedProps && normalizeKey(mergedProps),
     ref:
       extraProps && extraProps.ref
@@ -697,6 +716,10 @@ export function cloneVNode<T, U>(
     // they *should* be copied for kept-alive vnodes. So we just always copy
     // them since them being non-null during a mount doesn't affect the logic as
     // they will simply be overwritten.
+    // 从技术上讲，这些仅在已安装的VNode上为非空。然而
+    // 它们*应该*为保持活动的VNode复制。所以我们总是抄袭
+    // 由于它们在装载期间不为null，因此不会影响逻辑
+    // 它们只会被覆盖。
     component: vnode.component,
     suspense: vnode.suspense,
     ssContent: vnode.ssContent && cloneVNode(vnode.ssContent),
@@ -716,6 +739,7 @@ export function cloneVNode<T, U>(
  */
 /**
  * 深度克隆节点
+ * 使用递归克隆子集节点
  * @param vnode
  * @returns
  */
@@ -745,8 +769,8 @@ export function createTextVNode(text: string = ' ', flag: number = 0): VNode {
  */
 /**
  * 创建静态节点
- * @param content
- * @param numberOfNodes
+ * @param content 内容
+ * @param numberOfNodes 节点数量
  * @returns
  */
 export function createStaticVNode(
@@ -812,8 +836,8 @@ export function cloneIfMounted(child: VNode): VNode {
 }
 /**
  * 格式化子集
- * @param vnode
- * @param children
+ * @param vnode 虚拟节点
+ * @param children 子集
  * @returns
  */
 export function normalizeChildren(vnode: VNode, children: unknown) {
@@ -822,8 +846,10 @@ export function normalizeChildren(vnode: VNode, children: unknown) {
   if (children == null) {
     children = null
   } else if (isArray(children)) {
+    // 子集为一个数组
     type = ShapeFlags.ARRAY_CHILDREN
   } else if (typeof children === 'object') {
+    // 子集为一个对象
     if (shapeFlag & (ShapeFlags.ELEMENT | ShapeFlags.TELEPORT)) {
       // Normalize slot to plain children for plain element and Teleport
       const slot = (children as any).default
@@ -855,6 +881,7 @@ export function normalizeChildren(vnode: VNode, children: unknown) {
       }
     }
   } else if (isFunction(children)) {
+    // 子集是一个函数
     children = { default: children, _ctx: currentRenderingInstance }
     type = ShapeFlags.SLOTS_CHILDREN
   } else {

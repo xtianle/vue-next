@@ -197,8 +197,10 @@ let uid = 0
 
 /**
  * 创建app Api
- * @param render
- * @param hydrate
+ * @param render 渲染函数
+ * @param hydrate 与服务器渲染相关参数
+ * hydrate 描述的是 ReactDOM 复用 ReactDOMServer 服务端渲染的内容时尽可能保留结构，
+ * 并补充事件绑定等 Client 特有内容的过程。
  * @returns
  */
 export function createAppAPI<HostElement>(

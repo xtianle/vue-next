@@ -181,6 +181,11 @@ export function defineComponent<
 ): DefineComponent<PropsOptions, RawBindings, D, C, M, Mixin, Extends, E, EE>
 
 // implementation, close to no-op
+/**
+ * 定义函数
+ * @param options
+ * @returns
+ */
 export function defineComponent(options: unknown) {
   return isFunction(options) ? { setup: options, name: options.name } : options
 }

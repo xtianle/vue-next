@@ -180,7 +180,10 @@ export function useSlots(): SetupContext['slots'] {
 export function useAttrs(): SetupContext['attrs'] {
   return getContext().attrs
 }
-
+/**
+ * 获取上下文
+ * @returns
+ */
 function getContext(): SetupContext {
   const i = getCurrentInstance()!
   if (__DEV__ && !i) {
