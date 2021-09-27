@@ -41,15 +41,21 @@ import { checkCompatEnabled, isCompatEnabled } from './compat/compatConfig'
 import { ObjectWatchOptionItem } from './componentOptions'
 
 export type WatchEffect = (onInvalidate: InvalidateCbRegistrator) => void
-
+/**
+ * 监听得源数据
+ */
 export type WatchSource<T = any> = Ref<T> | ComputedRef<T> | (() => T)
-
+/**
+ * 监听得回调函数
+ */
 export type WatchCallback<V = any, OV = any> = (
   value: V,
   oldValue: OV,
   onInvalidate: InvalidateCbRegistrator
 ) => any
-
+/**
+ * map 得源数据
+ */
 type MapSources<T, Immediate> = {
   [K in keyof T]: T[K] extends WatchSource<infer V>
     ? Immediate extends true
@@ -61,13 +67,17 @@ type MapSources<T, Immediate> = {
       : T[K]
     : never
 }
-
+/**
+ * 无效的回调注册
+ */
 type InvalidateCbRegistrator = (cb: () => void) => void
 
 export interface WatchOptionsBase extends DebuggerOptions {
   flush?: 'pre' | 'post' | 'sync'
 }
-
+/**
+ * 监听的选项
+ */
 export interface WatchOptions<Immediate = boolean> extends WatchOptionsBase {
   immediate?: Immediate
   deep?: boolean
@@ -114,6 +124,7 @@ const INITIAL_WATCHER_VALUE = {}
 
 type MultiWatchSources = (WatchSource<unknown> | object)[]
 
+// watch 函数得重载类型
 // overload: array of multiple sources + cb
 export function watch<
   T extends MultiWatchSources,
@@ -168,7 +179,13 @@ export function watch<T = any, Immediate extends Readonly<boolean> = false>(
   }
   return doWatch(source as any, cb, options)
 }
-
+/**
+ * 运行doWatch
+ * @param source 数据源
+ * @param cb 回调函数
+ * @param param2
+ * @returns
+ */
 function doWatch(
   source: WatchSource | WatchSource[] | WatchEffect | object,
   cb: WatchCallback | null,
@@ -188,7 +205,10 @@ function doWatch(
       )
     }
   }
-
+  /**
+   * 警告无效源
+   * @param s
+   */
   const warnInvalidSource = (s: unknown) => {
     warn(
       `Invalid watch source: `,
@@ -197,19 +217,23 @@ function doWatch(
         `a reactive object, or an array of these types.`
     )
   }
-
+  // 当前实例
   const instance = currentInstance
   let getter: () => any
+  // 强制触发器
   let forceTrigger = false
+  // 是否是多个源
   let isMultiSource = false
-
   if (isRef(source)) {
+    // 源数据是ref
     getter = () => source.value
     forceTrigger = !!source._shallow
   } else if (isReactive(source)) {
+    // 源数据是reactive
     getter = () => source
     deep = true
   } else if (isArray(source)) {
+    // 源数据是一个数组
     isMultiSource = true
     forceTrigger = source.some(isReactive)
     getter = () =>
@@ -225,12 +249,14 @@ function doWatch(
         }
       })
   } else if (isFunction(source)) {
+    // 源数据是一个函数
     if (cb) {
       // getter with cb
       getter = () =>
         callWithErrorHandling(source, instance, ErrorCodes.WATCH_GETTER)
     } else {
       // no cb -> simple effect
+      // 没有回调  简单的效果
       getter = () => {
         if (instance && instance.isUnmounted) {
           return
@@ -265,7 +291,7 @@ function doWatch(
       return val
     }
   }
-
+  // 有回调并且为深度监听
   if (cb && deep) {
     const baseGetter = getter
     getter = () => traverse(baseGetter())
@@ -363,6 +389,7 @@ function doWatch(
   }
 
   // initial run
+  // 初次运行
   if (cb) {
     if (immediate) {
       job()
@@ -387,6 +414,14 @@ function doWatch(
 }
 
 // this.$watch
+/**
+ * 实例中的watch
+ * @param this
+ * @param source
+ * @param value
+ * @param options
+ * @returns
+ */
 export function instanceWatch(
   this: ComponentInternalInstance,
   source: string | Function,
@@ -416,7 +451,12 @@ export function instanceWatch(
   }
   return res
 }
-
+/**
+ * 创建getter
+ * @param ctx 上下文
+ * @param path
+ * @returns
+ */
 export function createPathGetter(ctx: any, path: string) {
   const segments = path.split('.')
   return () => {
@@ -427,7 +467,12 @@ export function createPathGetter(ctx: any, path: string) {
     return cur
   }
 }
-
+/**
+ *
+ * @param value
+ * @param seen
+ * @returns
+ */
 export function traverse(value: unknown, seen: Set<unknown> = new Set()) {
   if (!isObject(value) || (value as any)[ReactiveFlags.SKIP]) {
     return value

@@ -5,6 +5,8 @@ import { isPromise, isFunction } from '@vue/shared'
 
 // contexts where user provided function may be executed, in addition to
 // lifecycle hooks.
+// 可以执行用户提供的功能的上下文
+// 处理生命周期的钩子
 export const enum ErrorCodes {
   SETUP_FUNCTION,
   RENDER_FUNCTION,
