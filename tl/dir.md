@@ -1,5 +1,5 @@
 ├── packages
-│     ├── compiler-core
+│     ├── compiler-core     编译核心
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
@@ -74,7 +74,7 @@
 │     │     │     │     ├── compile.spec.ts.snap
 │     │     │     │     ├── parse.spec.ts.snap
 │     │     │     │     ├── scopeId.spec.ts.snap
-│     ├── compiler-dom
+│     ├── compiler-dom      编译dom
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
@@ -118,7 +118,7 @@
 │     │     │     │     │     ├── warnTransitionChildren.spec.ts.snap
 │     │     │     ├── __snapshots__
 │     │     │     │     ├── index.spec.ts.snap
-│     ├── compiler-sfc
+│     ├── compiler-sfc 编译单文件组件
 │     │     ├── api-extractor.json
 │     │     ├── LICENSE
 │     │     ├── package.json
@@ -161,7 +161,7 @@
 │     │     │     │     ├── cssVars.spec.ts.snap
 │     │     │     │     ├── templateTransformAssetUrl.spec.ts.snap
 │     │     │     │     ├── templateTransformSrcset.spec.ts.snap
-│     ├── compiler-ssr
+│     ├── compiler-ssr 编辑服务器渲染
 │     │     ├── api-extractor.json
 │     │     ├── LICENSE
 │     │     ├── package.json
@@ -235,7 +235,7 @@
 │     │     │     ├── ref.spec.ts
 │     │     │     ├── shallowReactive.spec.ts
 │     │     │     ├── shallowReadonly.spec.ts
-│     ├── ref-transform
+│     ├── ref-transform     ref转换
 │     │     ├── api-extractor.json
 │     │     ├── package.json
 │     │     ├── README.md
@@ -247,7 +247,7 @@
 │     │     │     ├── refTransform.spec.ts
 │     │     │     ├── __snapshots__
 │     │     │     │     ├── refTransform.spec.ts.snap
-│     ├── runtime-core
+│     ├── runtime-core      运行时核心
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
@@ -362,7 +362,7 @@
 │     │     │     ├── scopeId.spec.ts
 │     │     │     ├── vnode.spec.ts
 │     │     │     ├── vnodeHooks.spec.ts
-│     ├── runtime-dom
+│     ├── runtime-dom       运行时dom
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
@@ -411,7 +411,7 @@
 │     │     │     ├── patchProps.spec.ts
 │     │     │     ├── patchStyle.spec.ts
 │     │     │     ├── rendererStaticNode.spec.ts
-│     ├── runtime-test
+│     ├── runtime-test      运行时测试
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
@@ -425,7 +425,7 @@
 │     │     │     ├── triggerEvent.ts
 │     │     ├── __tests__
 │     │     │     ├── testRuntime.spec.ts
-│     ├── server-renderer
+│     ├── server-renderer      服务器渲染
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
@@ -459,7 +459,7 @@
 │     │     │     ├── ssrTeleport.spec.ts
 │     │     │     ├── ssrVModelHelpers.spec.ts
 │     │     │     ├── webStream.spec.ts
-│     ├── sfc-playground
+│     ├── sfc-playground        单文件组件处理
 │     │     ├── index.html
 │     │     ├── package.json
 │     │     ├── public
@@ -496,7 +496,7 @@
 │     │     │     ├── utils.ts
 │     │     │     ├── vue-dev-proxy.ts
 │     │     ├── vite.config.ts
-│     ├── shared
+│     ├── shared        公共函数
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
@@ -524,12 +524,12 @@
 │     │     │     ├── toDisplayString.spec.ts
 │     │     │     ├── __snapshots__
 │     │     │     │     ├── codeframe.spec.ts.snap
-│     ├── size-check
+│     ├── size-check        大小检查
 │     │     ├── package.json
 │     │     ├── README.md
 │     │     ├── src
 │     │     │     ├── index.ts
-│     ├── template-explorer
+│     ├── template-explorer     模板浏览器
 │     │     ├── index.html
 │     │     ├── local.html
 │     │     ├── package.json
@@ -539,7 +539,7 @@
 │     │     │     ├── options.ts
 │     │     │     ├── theme.ts
 │     │     ├── style.css
-│     ├── vue
+│     ├── vue       vue入口
 │     │     ├── api-extractor.json
 │     │     ├── examples
 │     │     │     ├── classic
@@ -584,7 +584,7 @@
 │     │     │     ├── transition.html
 │     │     │     ├── Transition.spec.ts
 │     │     │     ├── TransitionGroup.spec.ts
-│     ├── vue-compat
+│     ├── vue-compat        vue兼容
 │     │     ├── api-extractor.json
 │     │     ├── index.js
 │     │     ├── LICENSE
