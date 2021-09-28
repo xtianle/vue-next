@@ -27,12 +27,20 @@ const TO_REF_SYMBOL = '$$'
 const shorthands = ['ref', 'computed', 'shallowRef']
 const transformCheckRE = /[^\w]\$(?:\$|ref|computed|shallowRef)?\s*(\(|\<)/
 
+/**
+ * 应该转换
+ * @param src
+ * @returns
+ */
 export function shouldTransform(src: string): boolean {
   return transformCheckRE.test(src)
 }
 
 type Scope = Record<string, boolean>
 
+/**
+ * ref转换选项
+ */
 export interface RefTransformOptions {
   filename?: string
   sourceMap?: boolean
@@ -40,6 +48,9 @@ export interface RefTransformOptions {
   importHelpersFrom?: string
 }
 
+/**
+ * ref转换结果
+ */
 export interface RefTransformResults {
   code: string
   map: SourceMap | null
@@ -47,6 +58,12 @@ export interface RefTransformResults {
   importedHelpers: string[]
 }
 
+/**
+ * 转换
+ * @param src
+ * @param param1
+ * @returns
+ */
 export function transform(
   src: string,
   {
@@ -95,6 +112,14 @@ export function transform(
   }
 }
 
+/**
+ * 转换ast
+ * @param ast
+ * @param s
+ * @param offset
+ * @param knownRootVars
+ * @returns
+ */
 export function transformAST(
   ast: Program,
   s: MagicString,
@@ -429,6 +454,11 @@ export function transformAST(
   }
 }
 
+/**
+ * 是否是声明调用
+ * @param callee
+ * @returns
+ */
 function isToVarCall(callee: string): string | false {
   if (callee === TO_VAR_SYMBOL) {
     return TO_VAR_SYMBOL
@@ -441,7 +471,10 @@ function isToVarCall(callee: string): string | false {
 
 const RFC_LINK = `https://github.com/vuejs/rfcs/discussions/369`
 const hasWarned: Record<string, boolean> = {}
-
+/**
+ * 警告实验
+ * @returns
+ */
 function warnExperimental() {
   // eslint-disable-next-line
   if (typeof window !== 'undefined') {
@@ -454,7 +487,10 @@ function warnExperimental() {
       `You can follow the proposal's status at ${RFC_LINK}.`
   )
 }
-
+/**
+ * 警告宜昌
+ * @param msg
+ */
 function warnOnce(msg: string) {
   const isNodeProd =
     typeof process !== 'undefined' && process.env.NODE_ENV === 'production'
@@ -463,7 +499,10 @@ function warnOnce(msg: string) {
     warn(msg)
   }
 }
-
+/**
+ * j警告
+ * @param msg
+ */
 function warn(msg: string) {
   console.warn(
     `\x1b[1m\x1b[33m[@vue/compiler-sfc]\x1b[0m\x1b[33m ${msg}\x1b[0m\n`
