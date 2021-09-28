@@ -10,6 +10,18 @@ const nativeOnRE = /^on[a-z]/
 
 type DOMRendererOptions = RendererOptions<Node, Element>
 
+/**
+ * 补丁道具
+ * @param el
+ * @param key 属性key   class  style on头的事件 .或^开头的属性 其他属性
+ * @param prevValue
+ * @param nextValue
+ * @param isSVG
+ * @param prevChildren
+ * @param parentComponent
+ * @param parentSuspense
+ * @param unmountChildren
+ */
 export const patchProp: DOMRendererOptions['patchProp'] = (
   el,
   key,
@@ -60,6 +72,14 @@ export const patchProp: DOMRendererOptions['patchProp'] = (
   }
 }
 
+/**
+ * 应该设置为道具
+ * @param el
+ * @param key
+ * @param value
+ * @param isSVG
+ * @returns
+ */
 function shouldSetAsProp(
   el: Element,
   key: string,

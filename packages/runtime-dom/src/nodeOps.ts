@@ -2,15 +2,38 @@ import { RendererOptions } from '@vue/runtime-core'
 
 export const svgNS = 'http://www.w3.org/2000/svg'
 
+/**
+ * 文档
+ */
 const doc = (typeof document !== 'undefined' ? document : null) as Document
 
+/**
+ * 静态模板缓存
+ */
 const staticTemplateCache = new Map<string, DocumentFragment>()
 
+/**
+ * 节点的选项
+ * insert 插入
+ * remove 插入
+ * createElement 插入
+ * createText 插入
+ */
 export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
+  /**
+   * 插入元素
+   * @param child
+   * @param parent
+   * @param anchor
+   */
   insert: (child, parent, anchor) => {
     parent.insertBefore(child, anchor || null)
   },
 
+  /**
+   * 删除子集
+   * @param child
+   */
   remove: child => {
     const parent = child.parentNode
     if (parent) {
@@ -18,6 +41,14 @@ export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
     }
   },
 
+  /**
+   * 创建元素
+   * @param tag
+   * @param isSVG
+   * @param is
+   * @param props
+   * @returns
+   */
   createElement: (tag, isSVG, is, props): Element => {
     const el = isSVG
       ? doc.createElementNS(svgNS, tag)
@@ -30,28 +61,73 @@ export const nodeOps: Omit<RendererOptions<Node, Element>, 'patchProp'> = {
     return el
   },
 
+  /**
+   * 创建文本
+   * @param text
+   * @returns
+   */
   createText: text => doc.createTextNode(text),
 
+  /**
+   * 创建注释
+   * @param text
+   * @returns
+   */
   createComment: text => doc.createComment(text),
 
+  /**
+   * 设置文本
+   * @param node
+   * @param text
+   */
   setText: (node, text) => {
     node.nodeValue = text
   },
 
+  /**
+   * 设置元素文本
+   * @param el
+   * @param text
+   */
   setElementText: (el, text) => {
     el.textContent = text
   },
 
+  /**
+   * 父级节点
+   * @param node
+   * @returns
+   */
   parentNode: node => node.parentNode as Element | null,
 
+  /**
+   * 下一个节点
+   * @param node
+   * @returns
+   */
   nextSibling: node => node.nextSibling,
 
+  /**
+   * 查询选择器
+   * @param selector
+   * @returns
+   */
   querySelector: selector => doc.querySelector(selector),
 
+  /**
+   * 设置作用域id
+   * @param el
+   * @param id
+   */
   setScopeId(el, id) {
     el.setAttribute(id, '')
   },
 
+  /**
+   * 克隆节点
+   * @param el
+   * @returns
+   */
   cloneNode(el) {
     const cloned = el.cloneNode(true)
     // #3072
