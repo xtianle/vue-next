@@ -9,6 +9,15 @@ import {
 } from '@babel/types'
 import { walk } from 'estree-walker'
 
+/**
+ * 走标识
+ * @param root
+ * @param onIdentifier
+ * @param includeAll
+ * @param parentStack
+ * @param knownIds
+ * @returns
+ */
 export function walkIdentifiers(
   root: Node,
   onIdentifier: (
@@ -80,6 +89,13 @@ export function walkIdentifiers(
   })
 }
 
+/**
+ * 是否引入标识
+ * @param id
+ * @param parent
+ * @param parentStack
+ * @returns
+ */
 export function isReferencedIdentifier(
   id: Identifier,
   parent: Node | null,
@@ -116,6 +132,12 @@ export function isReferencedIdentifier(
   return false
 }
 
+/**
+ * 是否在解构赋值中
+ * @param parent
+ * @param parentStack
+ * @returns
+ */
 export function isInDestructureAssignment(
   parent: Node,
   parentStack: Node[]
@@ -137,6 +159,11 @@ export function isInDestructureAssignment(
   return false
 }
 
+/**
+ * 走函数参数
+ * @param node
+ * @param onIdent
+ */
 export function walkFunctionParams(
   node: Function,
   onIdent: (id: Identifier) => void
@@ -148,6 +175,11 @@ export function walkFunctionParams(
   }
 }
 
+/**
+ * 走块声明
+ * @param block
+ * @param onIdent
+ */
 export function walkBlockDeclarations(
   block: BlockStatement | Program,
   onIdent: (node: Identifier) => void
@@ -170,6 +202,12 @@ export function walkBlockDeclarations(
   }
 }
 
+/**
+ * 提取标识符
+ * @param param
+ * @param nodes
+ * @returns
+ */
 export function extractIdentifiers(
   param: Node,
   nodes: Identifier[] = []
@@ -215,6 +253,13 @@ export function extractIdentifiers(
   return nodes
 }
 
+/**
+ * 标记作用域标识符
+ * @param node
+ * @param child
+ * @param knownIds
+ * @returns
+ */
 function markScopeIdentifier(
   node: Node & { scopeIds?: Set<string> },
   child: Identifier,
@@ -232,14 +277,30 @@ function markScopeIdentifier(
   ;(node.scopeIds || (node.scopeIds = new Set())).add(name)
 }
 
+/**
+ * 是否是函数类型
+ * @param node
+ * @returns
+ */
 export const isFunctionType = (node: Node): node is Function => {
   return /Function(?:Expression|Declaration)$|Method$/.test(node.type)
 }
 
+/**
+ * 是否是静态属性
+ * @param node
+ * @returns
+ */
 export const isStaticProperty = (node: Node): node is ObjectProperty =>
   node &&
   (node.type === 'ObjectProperty' || node.type === 'ObjectMethod') &&
   !node.computed
 
+/**
+ * 是否是静态属性key
+ * @param node
+ * @param parent
+ * @returns
+ */
 export const isStaticPropertyKey = (node: Node, parent: Node) =>
   isStaticProperty(parent) && parent.key === node

@@ -76,11 +76,17 @@ export type StructuralDirectiveTransform = (
   context: TransformContext
 ) => void | (() => void)
 
+/**
+ * 引入项目
+ */
 export interface ImportItem {
   exp: string | ExpressionNode
   path: string
 }
 
+/**
+ * 转换内容
+ */
 export interface TransformContext
   extends Required<
       Omit<TransformOptions, 'filename' | keyof CompilerCompatOptions>
@@ -122,6 +128,12 @@ export interface TransformContext
   filters?: Set<string>
 }
 
+/**
+ * 创建转换内容
+ * @param root
+ * @param param1
+ * @returns
+ */
 export function createTransformContext(
   root: RootNode,
   {
@@ -314,6 +326,11 @@ export function createTransformContext(
   return context
 }
 
+/**
+ * 转换
+ * @param root
+ * @param options
+ */
 export function transform(root: RootNode, options: TransformOptions) {
   const context = createTransformContext(root, options)
   traverseNode(root, context)
@@ -337,6 +354,11 @@ export function transform(root: RootNode, options: TransformOptions) {
   }
 }
 
+/**
+ * 创建根编码
+ * @param root
+ * @param context
+ */
 function createRootCodegen(root: RootNode, context: TransformContext) {
   const { helper } = context
   const { children } = root
@@ -387,6 +409,11 @@ function createRootCodegen(root: RootNode, context: TransformContext) {
   }
 }
 
+/**
+ * 遍历子集
+ * @param parent
+ * @param context
+ */
 export function traverseChildren(
   parent: ParentNode,
   context: TransformContext
@@ -405,6 +432,12 @@ export function traverseChildren(
   }
 }
 
+/**
+ * 遍历节点
+ * @param node
+ * @param context
+ * @returns
+ */
 export function traverseNode(
   node: RootNode | TemplateChildNode,
   context: TransformContext
@@ -468,6 +501,12 @@ export function traverseNode(
   }
 }
 
+/**
+ * 创建结构指令转换
+ * @param name
+ * @param fn
+ * @returns
+ */
 export function createStructuralDirectiveTransform(
   name: string | RegExp,
   fn: StructuralDirectiveTransform

@@ -1,26 +1,51 @@
 import { SourceLocation } from './ast'
 
+/**
+ * 编译错误
+ */
 export interface CompilerError extends SyntaxError {
   code: number | string
   loc?: SourceLocation
 }
 
+/**
+ * 核心编译错误
+ */
 export interface CoreCompilerError extends CompilerError {
   code: ErrorCodes
 }
 
+/**
+ * 默认错误
+ * @param error
+ */
 export function defaultOnError(error: CompilerError) {
   throw error
 }
 
+/**
+ * 默认警告
+ * @param msg
+ */
 export function defaultOnWarn(msg: CompilerError) {
   __DEV__ && console.warn(`[Vue warn] ${msg.message}`)
 }
 
+/**
+ * 推断编译器错误
+ */
 type InferCompilerError<T> = T extends ErrorCodes
   ? CoreCompilerError
   : CompilerError
 
+/**
+ * 创建编辑错误
+ * @param code
+ * @param loc
+ * @param messages
+ * @param additionalMessage
+ * @returns
+ */
 export function createCompilerError<T extends number>(
   code: T,
   loc?: SourceLocation,
@@ -37,6 +62,9 @@ export function createCompilerError<T extends number>(
   return error
 }
 
+/**
+ * 错误编码
+ */
 export const enum ErrorCodes {
   // parse errors
   ABRUPT_CLOSING_OF_EMPTY_COMMENT,
@@ -102,6 +130,9 @@ export const enum ErrorCodes {
   __EXTEND_POINT__
 }
 
+/**
+ * 错误信息
+ */
 export const errorMessages: Record<ErrorCodes, string> = {
   // parse errors
   [ErrorCodes.ABRUPT_CLOSING_OF_EMPTY_COMMENT]: 'Illegal comment.',

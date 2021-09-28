@@ -66,6 +66,9 @@ const decodeMap: Record<string, string> = {
   quot: '"'
 }
 
+/**
+ * 默认解析器选项
+ */
 export const defaultParserOptions: MergedParserOptions = {
   delimiters: [`{{`, `}}`],
   getNamespace: () => Namespaces.HTML,
@@ -80,6 +83,9 @@ export const defaultParserOptions: MergedParserOptions = {
   comments: __DEV__
 }
 
+/**
+ * 文本模式
+ */
 export const enum TextModes {
   //          | Elements | Entities | End sign              | Inside of
   DATA, //    | ✔        | ✔        | End tags of ancestors |
@@ -89,6 +95,9 @@ export const enum TextModes {
   ATTRIBUTE_VALUE
 }
 
+/**
+ * 解析器上下文
+ */
 export interface ParserContext {
   options: MergedParserOptions
   readonly originalSource: string
@@ -101,6 +110,12 @@ export interface ParserContext {
   onWarn: NonNullable<ErrorHandlingOptions['onWarn']>
 }
 
+/**
+ * 基础解析器
+ * @param content
+ * @param options
+ * @returns
+ */
 export function baseParse(
   content: string,
   options: ParserOptions = {}
@@ -113,6 +128,12 @@ export function baseParse(
   )
 }
 
+/**
+ * 创建解析器上下文
+ * @param content
+ * @param rawOptions
+ * @returns
+ */
 function createParserContext(
   content: string,
   rawOptions: ParserOptions
@@ -140,6 +161,13 @@ function createParserContext(
   }
 }
 
+/**
+ * 解析子集
+ * @param context
+ * @param mode
+ * @param ancestors
+ * @returns
+ */
 function parseChildren(
   context: ParserContext,
   mode: TextModes,
@@ -306,6 +334,12 @@ function parseChildren(
   return removedWhitespace ? nodes.filter(Boolean) : nodes
 }
 
+/**
+ * 推入节点
+ * @param nodes
+ * @param node
+ * @returns
+ */
 function pushNode(nodes: TemplateChildNode[], node: TemplateChildNode): void {
   if (node.type === NodeTypes.TEXT) {
     const prev = last(nodes)
@@ -326,6 +360,9 @@ function pushNode(nodes: TemplateChildNode[], node: TemplateChildNode): void {
   nodes.push(node)
 }
 
+/**
+ * 解析cdata ？
+ */
 function parseCDATA(
   context: ParserContext,
   ancestors: ElementNode[]
@@ -346,6 +383,11 @@ function parseCDATA(
   return nodes
 }
 
+/**
+ * 解析注释
+ * @param context
+ * @returns
+ */
 function parseComment(context: ParserContext): CommentNode {
   __TEST__ && assert(startsWith(context.source, '<!--'))
 
@@ -388,6 +430,11 @@ function parseComment(context: ParserContext): CommentNode {
   }
 }
 
+/**
+ * 解析虚假评论
+ * @param context
+ * @returns
+ */
 function parseBogusComment(context: ParserContext): CommentNode | undefined {
   __TEST__ && assert(/^<(?:[\!\?]|\/[^a-z>])/i.test(context.source))
 
@@ -411,6 +458,12 @@ function parseBogusComment(context: ParserContext): CommentNode | undefined {
   }
 }
 
+/**
+ * 解析元素
+ * @param context
+ * @param ancestors
+ * @returns
+ */
 function parseElement(
   context: ParserContext,
   ancestors: ElementNode[]
@@ -490,11 +543,17 @@ function parseElement(
   return element
 }
 
+/**
+ * 标签类型
+ */
 const enum TagType {
   Start,
   End
 }
 
+/**
+ * 是特殊模板指令
+ */
 const isSpecialTemplateDirective = /*#__PURE__*/ makeMap(
   `if,else,else-if,for,slot`
 )
@@ -512,6 +571,13 @@ function parseTag(
   type: TagType.End,
   parent: ElementNode | undefined
 ): void
+/**
+ * 解析标签
+ * @param context
+ * @param type
+ * @param parent
+ * @returns
+ */
 function parseTag(
   context: ParserContext,
   type: TagType,
@@ -635,6 +701,13 @@ function parseTag(
   }
 }
 
+/**
+ * 是否是组件
+ * @param tag
+ * @param props
+ * @param context
+ * @returns
+ */
 function isComponent(
   tag: string,
   props: (AttributeNode | DirectiveNode)[],
@@ -694,6 +767,12 @@ function isComponent(
   }
 }
 
+/**
+ * 解析属性
+ * @param context
+ * @param type
+ * @returns
+ */
 function parseAttributes(
   context: ParserContext,
   type: TagType
@@ -728,6 +807,12 @@ function parseAttributes(
   return props
 }
 
+/**
+ * 解析属性
+ * @param context
+ * @param nameSet
+ * @returns
+ */
 function parseAttribute(
   context: ParserContext,
   nameSet: Set<string>
@@ -905,6 +990,11 @@ function parseAttribute(
   }
 }
 
+/**
+ * 解析属性值
+ * @param context
+ * @returns
+ */
 function parseAttributeValue(context: ParserContext): AttributeValue {
   const start = getCursor(context)
   let content: string
@@ -947,6 +1037,9 @@ function parseAttributeValue(context: ParserContext): AttributeValue {
   return { content, isQuoted, loc: getSelection(context, start) }
 }
 
+/**
+ * 解析插值
+ */
 function parseInterpolation(
   context: ParserContext,
   mode: TextModes
@@ -991,6 +1084,12 @@ function parseInterpolation(
   }
 }
 
+/**
+ * 解析文本
+ * @param context
+ * @param mode
+ * @returns
+ */
 function parseText(context: ParserContext, mode: TextModes): TextNode {
   __TEST__ && assert(context.source.length > 0)
 
@@ -1043,11 +1142,23 @@ function parseTextData(
   }
 }
 
+/**
+ * 获取光标
+ * @param context
+ * @returns
+ */
 function getCursor(context: ParserContext): Position {
   const { column, line, offset } = context
   return { column, line, offset }
 }
 
+/**
+ * 获取选择器
+ * @param context
+ * @param start
+ * @param end
+ * @returns
+ */
 function getSelection(
   context: ParserContext,
   start: Position,
@@ -1061,14 +1172,30 @@ function getSelection(
   }
 }
 
+/**
+ * 最后
+ * @param xs
+ * @returns
+ */
 function last<T>(xs: T[]): T | undefined {
   return xs[xs.length - 1]
 }
 
+/**
+ * 开始于
+ * @param source
+ * @param searchString
+ * @returns
+ */
 function startsWith(source: string, searchString: string): boolean {
   return source.startsWith(searchString)
 }
 
+/**
+ * 先进的
+ * @param context
+ * @param numberOfCharacters
+ */
 function advanceBy(context: ParserContext, numberOfCharacters: number): void {
   const { source } = context
   __TEST__ && assert(numberOfCharacters <= source.length)
@@ -1076,6 +1203,10 @@ function advanceBy(context: ParserContext, numberOfCharacters: number): void {
   context.source = source.slice(numberOfCharacters)
 }
 
+/**
+ * 前进空间
+ * @param context
+ */
 function advanceSpaces(context: ParserContext): void {
   const match = /^[\t\r\n\f ]+/.exec(context.source)
   if (match) {
@@ -1083,6 +1214,13 @@ function advanceSpaces(context: ParserContext): void {
   }
 }
 
+/**
+ * 获取新坐标
+ * @param context
+ * @param start
+ * @param numberOfCharacters
+ * @returns
+ */
 function getNewPosition(
   context: ParserContext,
   start: Position,
@@ -1095,6 +1233,13 @@ function getNewPosition(
   )
 }
 
+/**
+ * 触发错误
+ * @param context
+ * @param code
+ * @param offset
+ * @param loc
+ */
 function emitError(
   context: ParserContext,
   code: ErrorCodes,
@@ -1114,6 +1259,13 @@ function emitError(
   )
 }
 
+/**
+ * 是否最后
+ * @param context
+ * @param mode
+ * @param ancestors
+ * @returns
+ */
 function isEnd(
   context: ParserContext,
   mode: TextModes,
@@ -1152,6 +1304,12 @@ function isEnd(
   return !s
 }
 
+/**
+ *
+ * @param source
+ * @param tag
+ * @returns
+ */
 function startsWithEndTagOpen(source: string, tag: string): boolean {
   return (
     startsWith(source, '</') &&

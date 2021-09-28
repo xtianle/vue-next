@@ -84,6 +84,11 @@ const whitespaceRE = /\s+[.[]\s*|\s*[.[]\s+/g
  * inside square brackets), but it's ok since these are only used on template
  * expressions and false positives are invalid expressions in the first place.
  */
+/**
+ * 是否是成员表达式
+ * @param path
+ * @returns
+ */
 export const isMemberExpression = (path: string): boolean => {
   // remove whitespaces around . or [ first
   path = path.trim().replace(whitespaceRE, s => s.trim())
@@ -153,6 +158,13 @@ export const isMemberExpression = (path: string): boolean => {
   return !currentOpenBracketCount && !currentOpenParensCount
 }
 
+/**
+ * 获取内部范围
+ * @param loc
+ * @param offset
+ * @param length
+ * @returns
+ */
 export function getInnerRange(
   loc: SourceLocation,
   offset: number,
@@ -178,6 +190,13 @@ export function getInnerRange(
   return newLoc
 }
 
+/**
+ * 当前位置克隆
+ * @param pos
+ * @param source
+ * @param numberOfCharacters
+ * @returns
+ */
 export function advancePositionWithClone(
   pos: Position,
   source: string,
@@ -192,6 +211,13 @@ export function advancePositionWithClone(
 
 // advance by mutation without cloning (for performance reasons), since this
 // gets called a lot in the parser
+/**
+ * 当前位置是否变化
+ * @param pos
+ * @param source
+ * @param numberOfCharacters
+ * @returns
+ */
 export function advancePositionWithMutation(
   pos: Position,
   source: string,
@@ -216,6 +242,11 @@ export function advancePositionWithMutation(
   return pos
 }
 
+/**
+ * 资产
+ * @param condition
+ * @param msg
+ */
 export function assert(condition: boolean, msg?: string) {
   /* istanbul ignore if */
   if (!condition) {
@@ -223,6 +254,13 @@ export function assert(condition: boolean, msg?: string) {
   }
 }
 
+/**
+ * 查找dir
+ * @param node
+ * @param name
+ * @param allowEmpty
+ * @returns
+ */
 export function findDir(
   node: ElementNode,
   name: string | RegExp,
@@ -240,6 +278,14 @@ export function findDir(
   }
 }
 
+/**
+ * 查找prop
+ * @param node
+ * @param name
+ * @param dynamicOnly
+ * @param allowEmpty
+ * @returns
+ */
 export function findProp(
   node: ElementNode,
   name: string,
@@ -263,10 +309,21 @@ export function findProp(
   }
 }
 
+/**
+ * 是否绑定key
+ * @param arg
+ * @param name
+ * @returns
+ */
 export function isBindKey(arg: DirectiveNode['arg'], name: string): boolean {
   return !!(arg && isStaticExp(arg) && arg.content === name)
 }
 
+/**
+ * 是否有动态key绑定
+ * @param node
+ * @returns
+ */
 export function hasDynamicKeyVBind(node: ElementNode): boolean {
   return node.props.some(
     p =>
@@ -278,16 +335,29 @@ export function hasDynamicKeyVBind(node: ElementNode): boolean {
   )
 }
 
+/**
+ * 是否文本
+ */
 export function isText(
   node: TemplateChildNode
 ): node is TextNode | InterpolationNode {
   return node.type === NodeTypes.INTERPOLATION || node.type === NodeTypes.TEXT
 }
 
+/**
+ * 是否插槽
+ * @param p
+ * @returns
+ */
 export function isVSlot(p: ElementNode['props'][0]): p is DirectiveNode {
   return p.type === NodeTypes.DIRECTIVE && p.name === 'slot'
 }
 
+/**
+ * 是否模板节点
+ * @param node
+ * @returns
+ */
 export function isTemplateNode(
   node: RootNode | TemplateChildNode
 ): node is TemplateNode {
@@ -296,22 +366,45 @@ export function isTemplateNode(
   )
 }
 
+/**
+ * 是否插槽输出
+ * @param node
+ * @returns
+ */
 export function isSlotOutlet(
   node: RootNode | TemplateChildNode
 ): node is SlotOutletNode {
   return node.type === NodeTypes.ELEMENT && node.tagType === ElementTypes.SLOT
 }
 
+/**
+ * 获取VNode帮助程序
+ * @param ssr
+ * @param isComponent
+ * @returns
+ */
 export function getVNodeHelper(ssr: boolean, isComponent: boolean) {
   return ssr || isComponent ? CREATE_VNODE : CREATE_ELEMENT_VNODE
 }
 
+/**
+ * 获取VNode块帮助程序
+ * @param ssr
+ * @param isComponent
+ * @returns
+ */
 export function getVNodeBlockHelper(ssr: boolean, isComponent: boolean) {
   return ssr || isComponent ? CREATE_BLOCK : CREATE_ELEMENT_BLOCK
 }
 
 const propsHelperSet = new Set([NORMALIZE_PROPS, GUARD_REACTIVE_PROPS])
 
+/**
+ * 得到非标准化的道具
+ * @param props
+ * @param callPath
+ * @returns
+ */
 function getUnnormalizedProps(
   props: PropsExpression | '{}',
   callPath: CallExpression[] = []
@@ -331,6 +424,13 @@ function getUnnormalizedProps(
   }
   return [props, callPath]
 }
+
+/**
+ * 注入prop
+ * @param node
+ * @param prop
+ * @param context
+ */
 export function injectProp(
   node: VNodeCall | RenderSlotCall,
   prop: Property,
@@ -426,6 +526,12 @@ export function injectProp(
   }
 }
 
+/**
+ * 获取有效的资产Id
+ * @param name
+ * @param type
+ * @returns
+ */
 export function toValidAssetId(
   name: string,
   type: 'component' | 'directive' | 'filter'
@@ -437,6 +543,13 @@ export function toValidAssetId(
 }
 
 // Check if a node contains expressions that reference current context scope ids
+// 检查节点是否包含引用当前上下文范围ID的表达式
+/**
+ *
+ * @param node
+ * @param ids
+ * @returns
+ */
 export function hasScopeRef(
   node: TemplateChildNode | IfBranchNode | ExpressionNode | undefined,
   ids: TransformContext['identifiers']
@@ -491,6 +604,11 @@ export function hasScopeRef(
   }
 }
 
+/**
+ * 获取备忘VNode调用
+ * @param node
+ * @returns
+ */
 export function getMemoedVNodeCall(node: BlockCodegenNode | MemoExpression) {
   if (node.type === NodeTypes.JS_CALL_EXPRESSION && node.callee === WITH_MEMO) {
     return node.arguments[1].returns as VNodeCall
@@ -499,6 +617,11 @@ export function getMemoedVNodeCall(node: BlockCodegenNode | MemoExpression) {
   }
 }
 
+/**
+ * 创建块
+ * @param node
+ * @param param1
+ */
 export function makeBlock(
   node: VNodeCall,
   { helper, removeHelper, inSSR }: TransformContext

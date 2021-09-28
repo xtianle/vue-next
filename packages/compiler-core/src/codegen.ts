@@ -60,6 +60,9 @@ const PURE_ANNOTATION = `/*#__PURE__*/`
 
 type CodegenNode = TemplateChildNode | JSChildNode | SSRCodegenNode
 
+/**
+ * 编码结构
+ */
 export interface CodegenResult {
   code: string
   preamble: string
@@ -67,6 +70,9 @@ export interface CodegenResult {
   map?: RawSourceMap
 }
 
+/**
+ * 编码上下文
+ */
 export interface CodegenContext
   extends Omit<Required<CodegenOptions>, 'bindingMetadata' | 'inline'> {
   source: string
@@ -84,6 +90,12 @@ export interface CodegenContext
   newline(): void
 }
 
+/**
+ * 生成编码上下文
+ * @param ast
+ * @param param1
+ * @returns
+ */
 function createCodegenContext(
   ast: RootNode,
   {
@@ -185,6 +197,12 @@ function createCodegenContext(
   return context
 }
 
+/**
+ * 生成
+ * @param ast
+ * @param options
+ * @returns
+ */
 export function generate(
   ast: RootNode,
   options: CodegenOptions & {
@@ -312,6 +330,11 @@ export function generate(
   }
 }
 
+/**
+ * 生成函数序言
+ * @param ast
+ * @param context
+ */
 function genFunctionPreamble(ast: RootNode, context: CodegenContext) {
   const {
     ssr,
@@ -371,6 +394,13 @@ function genFunctionPreamble(ast: RootNode, context: CodegenContext) {
   push(`return `)
 }
 
+/**
+ * 生成模块序言
+ * @param ast
+ * @param context
+ * @param genScopeId
+ * @param inline
+ */
 function genModulePreamble(
   ast: RootNode,
   context: CodegenContext,
@@ -431,6 +461,12 @@ function genModulePreamble(
   }
 }
 
+/**
+ * 生成资源
+ * @param assets
+ * @param type
+ * @param param2
+ */
 function genAssets(
   assets: string[],
   type: 'component' | 'directive' | 'filter',
@@ -461,6 +497,12 @@ function genAssets(
   }
 }
 
+/**
+ * 生成提升
+ * @param hoists
+ * @param context
+ * @returns
+ */
 function genHoists(hoists: (JSChildNode | null)[], context: CodegenContext) {
   if (!hoists.length) {
     return
@@ -492,6 +534,12 @@ function genHoists(hoists: (JSChildNode | null)[], context: CodegenContext) {
   context.pure = false
 }
 
+/**
+ * 生成引入
+ * @param importsOptions
+ * @param context
+ * @returns
+ */
 function genImports(importsOptions: ImportItem[], context: CodegenContext) {
   if (!importsOptions.length) {
     return
@@ -504,6 +552,11 @@ function genImports(importsOptions: ImportItem[], context: CodegenContext) {
   })
 }
 
+/**
+ * 是否是文本
+ * @param n
+ * @returns
+ */
 function isText(n: string | CodegenNode) {
   return (
     isString(n) ||
@@ -514,6 +567,11 @@ function isText(n: string | CodegenNode) {
   )
 }
 
+/**
+ * 生成节点列表数组
+ * @param nodes
+ * @param context
+ */
 function genNodeListAsArray(
   nodes: (string | CodegenNode | TemplateChildNode[])[],
   context: CodegenContext
@@ -528,6 +586,13 @@ function genNodeListAsArray(
   context.push(`]`)
 }
 
+/**
+ * 生成节点列表
+ * @param nodes
+ * @param context
+ * @param multilines
+ * @param comma
+ */
 function genNodeList(
   nodes: (string | symbol | CodegenNode | TemplateChildNode[])[],
   context: CodegenContext,
@@ -555,6 +620,12 @@ function genNodeList(
   }
 }
 
+/**
+ * 生成节点
+ * @param node
+ * @param context
+ * @returns
+ */
 function genNode(node: CodegenNode | symbol | string, context: CodegenContext) {
   if (isString(node)) {
     context.push(node)
@@ -651,6 +722,11 @@ function genNode(node: CodegenNode | symbol | string, context: CodegenContext) {
   }
 }
 
+/**
+ * 生成文本
+ * @param node
+ * @param context
+ */
 function genText(
   node: TextNode | SimpleExpressionNode,
   context: CodegenContext
@@ -658,11 +734,21 @@ function genText(
   context.push(JSON.stringify(node.content), node)
 }
 
+/**
+ * 生成表达式
+ * @param node
+ * @param context
+ */
 function genExpression(node: SimpleExpressionNode, context: CodegenContext) {
   const { content, isStatic } = node
   context.push(isStatic ? JSON.stringify(content) : content, node)
 }
 
+/**
+ * 生成插值
+ * @param node
+ * @param context
+ */
 function genInterpolation(node: InterpolationNode, context: CodegenContext) {
   const { push, helper, pure } = context
   if (pure) push(PURE_ANNOTATION)
@@ -671,6 +757,11 @@ function genInterpolation(node: InterpolationNode, context: CodegenContext) {
   push(`)`)
 }
 
+/**
+ * 生成复杂表达式
+ * @param node
+ * @param context
+ */
 function genCompoundExpression(
   node: CompoundExpressionNode,
   context: CodegenContext
@@ -685,6 +776,11 @@ function genCompoundExpression(
   }
 }
 
+/**
+ * 表达式作为属性键
+ * @param node
+ * @param context
+ */
 function genExpressionAsPropertyKey(
   node: ExpressionNode,
   context: CodegenContext
@@ -705,6 +801,11 @@ function genExpressionAsPropertyKey(
   }
 }
 
+/**
+ * 生成注释
+ * @param node
+ * @param context
+ */
 function genComment(node: CommentNode, context: CodegenContext) {
   const { push, helper, pure } = context
   if (pure) {
@@ -713,6 +814,11 @@ function genComment(node: CommentNode, context: CodegenContext) {
   push(`${helper(CREATE_COMMENT)}(${JSON.stringify(node.content)})`, node)
 }
 
+/**
+ * 生成vnode调用
+ * @param node
+ * @param context
+ */
 function genVNodeCall(node: VNodeCall, context: CodegenContext) {
   const { push, helper, pure } = context
   const {
@@ -754,6 +860,11 @@ function genVNodeCall(node: VNodeCall, context: CodegenContext) {
   }
 }
 
+/**
+ * 生成空参数
+ * @param args
+ * @returns
+ */
 function genNullableArgs(args: any[]): CallExpression['arguments'] {
   let i = args.length
   while (i--) {
@@ -763,6 +874,11 @@ function genNullableArgs(args: any[]): CallExpression['arguments'] {
 }
 
 // JavaScript
+/**
+ * 生成调用表达式
+ * @param node
+ * @param context
+ */
 function genCallExpression(node: CallExpression, context: CodegenContext) {
   const { push, helper, pure } = context
   const callee = isString(node.callee) ? node.callee : helper(node.callee)
@@ -774,6 +890,12 @@ function genCallExpression(node: CallExpression, context: CodegenContext) {
   push(`)`)
 }
 
+/**
+ * 生成对象表达式
+ * @param node
+ * @param context
+ * @returns
+ */
 function genObjectExpression(node: ObjectExpression, context: CodegenContext) {
   const { push, indent, deindent, newline } = context
   const { properties } = node
@@ -804,10 +926,20 @@ function genObjectExpression(node: ObjectExpression, context: CodegenContext) {
   push(multilines ? `}` : ` }`)
 }
 
+/**
+ * 生成数组表达式
+ * @param node
+ * @param context
+ */
 function genArrayExpression(node: ArrayExpression, context: CodegenContext) {
   genNodeListAsArray(node.elements as CodegenNode[], context)
 }
 
+/**
+ * 生成函数表达式
+ * @param node
+ * @param context
+ */
 function genFunctionExpression(
   node: FunctionExpression,
   context: CodegenContext
@@ -853,6 +985,11 @@ function genFunctionExpression(
   }
 }
 
+/**
+ * 生成条件表达式
+ * @param node
+ * @param context
+ */
 function genConditionalExpression(
   node: ConditionalExpression,
   context: CodegenContext
@@ -889,6 +1026,11 @@ function genConditionalExpression(
   needNewline && deindent(true /* without newline */)
 }
 
+/**
+ * 生成缓存表达式
+ * @param node
+ * @param context
+ */
 function genCacheExpression(node: CacheExpression, context: CodegenContext) {
   const { push, helper, indent, deindent, newline } = context
   push(`_cache[${node.index}] || (`)
@@ -910,6 +1052,9 @@ function genCacheExpression(node: CacheExpression, context: CodegenContext) {
   push(`)`)
 }
 
+/**
+ * 生成模板文本
+ */
 function genTemplateLiteral(node: TemplateLiteral, context: CodegenContext) {
   const { push, indent, deindent } = context
   push('`')
@@ -930,6 +1075,11 @@ function genTemplateLiteral(node: TemplateLiteral, context: CodegenContext) {
   push('`')
 }
 
+/**
+ * 生成if语句
+ * @param node
+ * @param context
+ */
 function genIfStatement(node: IfStatement, context: CodegenContext) {
   const { push, indent, deindent } = context
   const { test, consequent, alternate } = node
@@ -954,6 +1104,11 @@ function genIfStatement(node: IfStatement, context: CodegenContext) {
   }
 }
 
+/**
+ * 生成赋值表达式
+ * @param node
+ * @param context
+ */
 function genAssignmentExpression(
   node: AssignmentExpression,
   context: CodegenContext
@@ -963,6 +1118,11 @@ function genAssignmentExpression(
   genNode(node.right, context)
 }
 
+/**
+ * 生成序列表达式
+ * @param node
+ * @param context
+ */
 function genSequenceExpression(
   node: SequenceExpression,
   context: CodegenContext
@@ -972,6 +1132,11 @@ function genSequenceExpression(
   context.push(`)`)
 }
 
+/**
+ * 生成返回语句
+ * @param param0
+ * @param context
+ */
 function genReturnStatement(
   { returns }: ReturnStatement,
   context: CodegenContext

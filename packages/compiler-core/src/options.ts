@@ -9,11 +9,17 @@ import {
 import { CompilerCompatOptions } from './compat/compatConfig'
 import { ParserPlugin } from '@babel/parser'
 
+/**
+ * 错误处理选项
+ */
 export interface ErrorHandlingOptions {
   onWarn?: (warning: CompilerError) => void
   onError?: (error: CompilerError) => void
 }
 
+/**
+ * 解析器选项
+ */
 export interface ParserOptions
   extends ErrorHandlingOptions,
     CompilerCompatOptions {
@@ -67,12 +73,18 @@ export interface ParserOptions
   comments?: boolean
 }
 
+/**
+ * 提升转换
+ */
 export type HoistTransform = (
   children: TemplateChildNode[],
   context: TransformContext,
   parent: ParentNode
 ) => void
 
+/**
+ * 绑定类型
+ */
 export const enum BindingTypes {
   /**
    * returned from data()
@@ -106,12 +118,18 @@ export const enum BindingTypes {
   OPTIONS = 'options'
 }
 
+/**
+ * 绑定元数据
+ */
 export type BindingMetadata = {
   [key: string]: BindingTypes | undefined
 } & {
   __isScriptSetup?: boolean
 }
 
+/**
+ * 共享转换代码生成选项
+ */
 interface SharedTransformCodegenOptions {
   /**
    * Transform expressions like {{ foo }} to `_ctx.foo`.
@@ -164,6 +182,9 @@ interface SharedTransformCodegenOptions {
   filename?: string
 }
 
+/**
+ * 转换选项
+ */
 export interface TransformOptions
   extends SharedTransformCodegenOptions,
     ErrorHandlingOptions,
@@ -244,6 +265,9 @@ export interface TransformOptions
   ssrCssVars?: string
 }
 
+/**
+ * 编码选项
+ */
 export interface CodegenOptions extends SharedTransformCodegenOptions {
   /**
    * - `module` mode will generate ES module import statements for helpers
@@ -283,4 +307,7 @@ export interface CodegenOptions extends SharedTransformCodegenOptions {
   runtimeGlobalName?: string
 }
 
+/**
+ * 编译选项
+ */
 export type CompilerOptions = ParserOptions & TransformOptions & CodegenOptions

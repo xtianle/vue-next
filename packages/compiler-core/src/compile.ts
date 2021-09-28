@@ -19,11 +19,19 @@ import { transformFilter } from './compat/transformFilter'
 import { defaultOnError, createCompilerError, ErrorCodes } from './errors'
 import { transformMemo } from './transforms/vMemo'
 
+/**
+ * 转换预设
+ */
 export type TransformPreset = [
   NodeTransform[],
   Record<string, DirectiveTransform>
 ]
 
+/**
+ * 获取基础转换预设
+ * @param prefixIdentifiers
+ * @returns
+ */
 export function getBaseTransformPreset(
   prefixIdentifiers?: boolean
 ): TransformPreset {
