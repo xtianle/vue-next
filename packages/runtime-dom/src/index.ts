@@ -24,14 +24,23 @@ declare module '@vue/reactivity' {
   }
 }
 
+/**
+ * 渲染选项
+ */
 const rendererOptions = extend({ patchProp }, nodeOps)
 
 // lazy create the renderer - this makes core renderer logic tree-shakable
 // in case the user only imports reactivity utilities from Vue.
+// 延迟创建渲染器-这使得核心渲染器逻辑树不稳定
+// 如果用户仅从Vue导入反应性实用程序。
 let renderer: Renderer<Element | ShadowRoot> | HydrationRenderer
 
 let enabledHydration = false
 
+/**
+ * 确保渲染器
+ * @returns
+ */
 function ensureRenderer() {
   return (
     renderer ||
@@ -39,6 +48,10 @@ function ensureRenderer() {
   )
 }
 
+/**
+ * 确保水化渲染器
+ * @returns
+ */
 function ensureHydrationRenderer() {
   renderer = enabledHydration
     ? renderer
@@ -48,14 +61,23 @@ function ensureHydrationRenderer() {
 }
 
 // use explicit type casts here to avoid import() calls in rolled-up d.ts
+/**
+ * 渲染
+ */
 export const render = ((...args) => {
   ensureRenderer().render(...args)
 }) as RootRenderFunction<Element | ShadowRoot>
 
+/**
+ * 注水
+ */
 export const hydrate = ((...args) => {
   ensureHydrationRenderer().hydrate(...args)
 }) as RootHydrateFunction
 
+/**
+ * 创建app
+ */
 export const createApp = ((...args) => {
   const app = ensureRenderer().createApp(...args)
 
@@ -65,6 +87,11 @@ export const createApp = ((...args) => {
   }
 
   const { mount } = app
+  /**
+   * 重新app挂载的方法
+   * @param containerOrSelector
+   * @returns
+   */
   app.mount = (containerOrSelector: Element | ShadowRoot | string): any => {
     const container = normalizeContainer(containerOrSelector)
     if (!container) return
@@ -92,8 +119,11 @@ export const createApp = ((...args) => {
     }
 
     // clear content before mounting
+    // 在挂载前清除内容
     container.innerHTML = ''
+    // 开始挂载
     const proxy = mount(container, false, container instanceof SVGElement)
+    //
     if (container instanceof Element) {
       container.removeAttribute('v-cloak')
       container.setAttribute('data-v-app', '')
@@ -104,6 +134,9 @@ export const createApp = ((...args) => {
   return app
 }) as CreateAppFunction<Element>
 
+/**
+ * 创建srr app
+ */
 export const createSSRApp = ((...args) => {
   const app = ensureHydrationRenderer().createApp(...args)
 
@@ -123,6 +156,10 @@ export const createSSRApp = ((...args) => {
   return app
 }) as CreateAppFunction<Element>
 
+/**
+ * 注入本机标记检查
+ * @param app
+ */
 function injectNativeTagCheck(app: App) {
   // Inject `isNativeTag`
   // this is used for component name validation (dev only)
@@ -133,6 +170,10 @@ function injectNativeTagCheck(app: App) {
 }
 
 // dev only
+/**
+ * 注入编译选项检查
+ * @param app
+ */
 function injectCompilerOptionsCheck(app: App) {
   if (isRuntimeOnly()) {
     const isCustomElement = app.config.isCustomElement
@@ -170,6 +211,11 @@ function injectCompilerOptionsCheck(app: App) {
   }
 }
 
+/**
+ * 标准化容器
+ * @param container
+ * @returns
+ */
 function normalizeContainer(
   container: Element | ShadowRoot | string
 ): Element | null {
@@ -196,6 +242,9 @@ function normalizeContainer(
 }
 
 // Custom element support
+/**
+ * 自定义元素支持
+ */
 export {
   defineCustomElement,
   defineSSRCustomElement,
@@ -204,10 +253,12 @@ export {
 } from './apiCustomElement'
 
 // SFC CSS utilities
+// sfc 样式 实用程序
 export { useCssModule } from './helpers/useCssModule'
 export { useCssVars } from './helpers/useCssVars'
 
 // DOM-only components
+// 仅DOM组件
 export { Transition, TransitionProps } from './components/Transition'
 export {
   TransitionGroup,
@@ -215,6 +266,7 @@ export {
 } from './components/TransitionGroup'
 
 // **Internal** DOM-only runtime directive helpers
+// **内部**仅限DOM运行时指令帮助程序
 export {
   vModelText,
   vModelCheckbox,
@@ -227,4 +279,6 @@ export { vShow } from './directives/vShow'
 
 // re-export everything from core
 // h, Component, reactivity API, nextTick, flags & types
+//从core再出口所有产品
+//h、组件、反应性API、nextTick、标志和类型
 export * from '@vue/runtime-core'
