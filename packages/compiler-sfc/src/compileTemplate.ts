@@ -25,11 +25,17 @@ import consolidate from 'consolidate'
 import { warnOnce } from './warn'
 import { genCssVarsFromList } from './cssVars'
 
+/**
+ * 模板编译
+ */
 export interface TemplateCompiler {
   compile(template: string, options: CompilerOptions): CodegenResult
   parse(template: string, options: ParserOptions): RootNode
 }
 
+/**
+ * sfc 模板编译结果
+ */
 export interface SFCTemplateCompileResults {
   code: string
   ast?: RootNode
@@ -40,6 +46,9 @@ export interface SFCTemplateCompileResults {
   map?: RawSourceMap
 }
 
+/**
+ * sfc 模板编译选项
+ */
 export interface SFCTemplateCompileOptions {
   source: string
   filename: string
@@ -75,6 +84,12 @@ interface PreProcessor {
   ): void
 }
 
+/**
+ * 预处理
+ * @param param0
+ * @param preprocessor
+ * @returns
+ */
 function preprocess(
   { source, filename, preprocessOptions }: SFCTemplateCompileOptions,
   preprocessor: PreProcessor
@@ -99,6 +114,11 @@ function preprocess(
   return res
 }
 
+/**
+ * 编译模板
+ * @param options
+ * @returns
+ */
 export function compileTemplate(
   options: SFCTemplateCompileOptions
 ): SFCTemplateCompileResults {
@@ -153,6 +173,11 @@ export function compileTemplate(
   }
 }
 
+/**
+ * 从模板编译
+ * @param param0
+ * @returns
+ */
 function doCompileTemplate({
   filename,
   id,
@@ -241,6 +266,12 @@ function doCompileTemplate({
   return { code, ast, preamble, source, errors, tips, map }
 }
 
+/**
+ * 地图线
+ * @param oldMap
+ * @param newMap
+ * @returns
+ */
 function mapLines(oldMap: RawSourceMap, newMap: RawSourceMap): RawSourceMap {
   if (!oldMap) return newMap
   if (!newMap) return oldMap
@@ -294,6 +325,12 @@ function mapLines(oldMap: RawSourceMap, newMap: RawSourceMap): RawSourceMap {
   return generator.toJSON()
 }
 
+/**
+ * 补丁错误
+ * @param errors
+ * @param source
+ * @param inMap
+ */
 function patchErrors(
   errors: CompilerError[],
   source: string,

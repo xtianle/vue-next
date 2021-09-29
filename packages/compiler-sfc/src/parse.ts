@@ -13,6 +13,9 @@ import { Statement } from '@babel/types'
 import { parseCssVars } from './cssVars'
 import { createCache } from './cache'
 
+/**
+ * src 解析选项
+ */
 export interface SFCParseOptions {
   filename?: string
   sourceMap?: boolean
@@ -22,6 +25,9 @@ export interface SFCParseOptions {
   compiler?: TemplateCompiler
 }
 
+/**
+ * sfc 块
+ */
 export interface SFCBlock {
   type: string
   content: string
@@ -32,11 +38,17 @@ export interface SFCBlock {
   src?: string
 }
 
+/**
+ * sfc 模板块
+ */
 export interface SFCTemplateBlock extends SFCBlock {
   type: 'template'
   ast: ElementNode
 }
 
+/**
+ * sfc 脚本块
+ */
 export interface SFCScriptBlock extends SFCBlock {
   type: 'script'
   setup?: string | boolean
@@ -44,12 +56,18 @@ export interface SFCScriptBlock extends SFCBlock {
   scriptAst?: Statement[]
   scriptSetupAst?: Statement[]
 }
+/**
+ * sfc 样式块
+ */
 export interface SFCStyleBlock extends SFCBlock {
   type: 'style'
   scoped?: boolean
   module?: string | boolean
 }
 
+/**
+ * sfc 描述
+ */
 export interface SFCDescriptor {
   filename: string
   source: string
@@ -64,13 +82,25 @@ export interface SFCDescriptor {
   slotted: boolean
 }
 
+/**
+ * sfc 解析结果
+ */
 export interface SFCParseResult {
   descriptor: SFCDescriptor
   errors: (CompilerError | SyntaxError)[]
 }
 
+/**
+ * 创建缓存
+ */
 const sourceToSFC = createCache<SFCParseResult>()
 
+/**
+ * 解析
+ * @param source
+ * @param param1
+ * @returns
+ */
 export function parse(
   source: string,
   {
@@ -258,6 +288,12 @@ export function parse(
   return result
 }
 
+/**
+ * 创建重复块错误
+ * @param node
+ * @param isScriptSetup
+ * @returns
+ */
 function createDuplicateBlockError(
   node: ElementNode,
   isScriptSetup = false
@@ -271,6 +307,13 @@ function createDuplicateBlockError(
   return err
 }
 
+/**
+ * 创建块
+ * @param node
+ * @param source
+ * @param pad
+ * @returns
+ */
 function createBlock(
   node: ElementNode,
   source: string,
@@ -334,6 +377,15 @@ const splitRE = /\r?\n/g
 const emptyRE = /^(?:\/\/)?\s*$/
 const replaceRE = /./g
 
+/**
+ * 生成源码map
+ * @param filename
+ * @param source
+ * @param generated
+ * @param sourceRoot
+ * @param lineOffset
+ * @returns
+ */
 function generateSourceMap(
   filename: string,
   source: string,
@@ -370,6 +422,13 @@ function generateSourceMap(
   return JSON.parse(map.toString())
 }
 
+/**
+ * 内容垫片
+ * @param content
+ * @param block
+ * @param pad
+ * @returns
+ */
 function padContent(
   content: string,
   block: SFCBlock,
@@ -385,6 +444,11 @@ function padContent(
   }
 }
 
+/**
+ * 是否有src
+ * @param node
+ * @returns
+ */
 function hasSrc(node: ElementNode) {
   return node.props.some(p => {
     if (p.type !== NodeTypes.ATTRIBUTE) {
@@ -397,6 +461,11 @@ function hasSrc(node: ElementNode) {
 /**
  * Returns true if the node has no children
  * once the empty text nodes (trimmed content) have been filtered out.
+ */
+/**
+ * 是否是空的
+ * @param node
+ * @returns
  */
 function isEmpty(node: ElementNode) {
   return (

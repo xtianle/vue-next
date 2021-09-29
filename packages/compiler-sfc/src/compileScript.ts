@@ -120,6 +120,12 @@ interface ImportBinding {
  * It requires the whole SFC descriptor because we need to handle and merge
  * normal `<script>` + `<script setup>` if both are present.
  */
+/**
+ * 编译脚本
+ * @param sfc
+ * @param options
+ * @returns
+ */
 export function compileScript(
   sfc: SFCDescriptor,
   options: SFCScriptCompileOptions
@@ -270,11 +276,23 @@ export function compileScript(
   const scriptStartOffset = script && script.loc.start.offset
   const scriptEndOffset = script && script.loc.end.offset
 
+  /**
+   * 助手
+   * @param key
+   * @returns
+   */
   function helper(key: string): string {
     helperImports.add(key)
     return `_${key}`
   }
 
+  /**
+   * 解析
+   * @param input
+   * @param options
+   * @param offset
+   * @returns
+   */
   function parse(
     input: string,
     options: ParserOptions,
@@ -290,6 +308,12 @@ export function compileScript(
     }
   }
 
+  /**
+   * 错误
+   * @param msg
+   * @param node
+   * @param end
+   */
   function error(
     msg: string,
     node: Node,
@@ -304,6 +328,14 @@ export function compileScript(
     )
   }
 
+  /**
+   * 注册用户引入
+   * @param source
+   * @param local
+   * @param imported
+   * @param isType
+   * @param isFromSetup
+   */
   function registerUserImport(
     source: string,
     local: string,
@@ -333,6 +365,11 @@ export function compileScript(
     }
   }
 
+  /**
+   * 过程定义道具
+   * @param node
+   * @returns
+   */
   function processDefineProps(node: Node): boolean {
     if (!isCallOf(node, DEFINE_PROPS)) {
       return false
@@ -373,6 +410,11 @@ export function compileScript(
     return true
   }
 
+  /**
+   * 使用默认值处理
+   * @param node
+   * @returns
+   */
   function processWithDefaults(node: Node): boolean {
     if (!isCallOf(node, WITH_DEFAULTS)) {
       return false
@@ -404,6 +446,11 @@ export function compileScript(
     return true
   }
 
+  /**
+   * 过程定义发射
+   * @param node
+   * @returns
+   */
   function processDefineEmits(node: Node): boolean {
     if (!isCallOf(node, DEFINE_EMITS)) {
       return false
@@ -439,6 +486,12 @@ export function compileScript(
     return true
   }
 
+  /**
+   * 解析限定类型
+   * @param node
+   * @param qualifier
+   * @returns
+   */
   function resolveQualifiedType(
     node: Node,
     qualifier: (node: Node) => boolean
@@ -479,6 +532,11 @@ export function compileScript(
     }
   }
 
+  /**
+   * 进程定义公开
+   * @param node
+   * @returns
+   */
   function processDefineExpose(node: Node): boolean {
     if (isCallOf(node, DEFINE_EXPOSE)) {
       if (hasDefineExposeCall) {
@@ -490,6 +548,12 @@ export function compileScript(
     return false
   }
 
+  /**
+   * 检查无效的作用域引用
+   * @param node
+   * @param method
+   * @returns
+   */
   function checkInvalidScopeReference(node: Node | undefined, method: string) {
     if (!node) return
     walkIdentifiers(node, id => {
@@ -1276,6 +1340,12 @@ export function compileScript(
   }
 }
 
+/**
+ * 注册绑定
+ * @param bindings
+ * @param node
+ * @param type
+ */
 function registerBinding(
   bindings: Record<string, BindingTypes>,
   node: Identifier,
@@ -1284,6 +1354,12 @@ function registerBinding(
   bindings[node.name] = type
 }
 
+/**
+ * 等待声明
+ * @param node
+ * @param bindings
+ * @param userImportAlias
+ */
 function walkDeclaration(
   node: Declaration,
   bindings: Record<string, BindingTypes>,
@@ -1339,6 +1415,13 @@ function walkDeclaration(
   }
 }
 
+/**
+ * 等待对象模式
+ * @param node
+ * @param bindings
+ * @param isConst
+ * @param isDefineCall
+ */
 function walkObjectPattern(
   node: ObjectPattern,
   bindings: Record<string, BindingTypes>,
@@ -1370,6 +1453,13 @@ function walkObjectPattern(
   }
 }
 
+/**
+ * 等待数组
+ * @param node
+ * @param bindings
+ * @param isConst
+ * @param isDefineCall
+ */
 function walkArrayPattern(
   node: ArrayPattern,
   bindings: Record<string, BindingTypes>,
@@ -1381,6 +1471,13 @@ function walkArrayPattern(
   }
 }
 
+/**
+ * 等待
+ * @param node
+ * @param bindings
+ * @param isConst
+ * @param isDefineCall
+ */
 function walkPattern(
   node: Node,
   bindings: Record<string, BindingTypes>,
@@ -1422,6 +1519,11 @@ interface PropTypeData {
   required: boolean
 }
 
+/**
+ * 记录type
+ * @param node
+ * @param declaredTypes
+ */
 function recordType(node: Node, declaredTypes: Record<string, string[]>) {
   if (node.type === 'TSInterfaceDeclaration') {
     declaredTypes[node.id.name] = [`Object`]
@@ -1435,6 +1537,12 @@ function recordType(node: Node, declaredTypes: Record<string, string[]>) {
   }
 }
 
+/**
+ * 提取运行时props
+ * @param node
+ * @param props
+ * @param declaredTypes
+ */
 function extractRuntimeProps(
   node: TSTypeLiteral | TSInterfaceBody,
   props: Record<string, PropTypeData>,
@@ -1466,6 +1574,12 @@ function extractRuntimeProps(
   }
 }
 
+/**
+ * 推断运行时类型
+ * @param node
+ * @param declaredTypes
+ * @returns
+ */
 function inferRuntimeType(
   node: TSType,
   declaredTypes: Record<string, string[]>
@@ -1549,10 +1663,21 @@ function inferRuntimeType(
   }
 }
 
+/**
+ * 转换运行时类型字符串
+ * @param types
+ * @returns
+ */
 function toRuntimeTypeString(types: string[]) {
   return types.length > 1 ? `[${types.join(', ')}]` : types[0]
 }
 
+/**
+ * 提取运行时触发器
+ * @param node
+ * @param emits
+ * @returns
+ */
 function extractRuntimeEmits(
   node: TSFunctionType | TSTypeLiteral | TSInterfaceBody,
   emits: Set<string>
@@ -1570,6 +1695,11 @@ function extractRuntimeEmits(
   }
 }
 
+/**
+ * 提取事件名称
+ * @param eventName
+ * @param emits
+ */
 function extractEventNames(
   eventName: Identifier | RestElement,
   emits: Set<string>
@@ -1597,6 +1727,11 @@ function extractEventNames(
   }
 }
 
+/**
+ * 生成运行时 emits
+ * @param emits
+ * @returns
+ */
 function genRuntimeEmits(emits: Set<string>) {
   return emits.size
     ? `\n  emits: [${Array.from(emits)
@@ -1605,6 +1740,12 @@ function genRuntimeEmits(emits: Set<string>) {
     : ``
 }
 
+/**
+ * 是否调用
+ * @param node
+ * @param test
+ * @returns
+ */
 function isCallOf(
   node: Node | null | undefined,
   test: string | ((id: string) => boolean)
@@ -1619,6 +1760,12 @@ function isCallOf(
   )
 }
 
+/**
+ * 永远不能被引用
+ * @param node
+ * @param userReactiveImport
+ * @returns
+ */
 function canNeverBeRef(node: Node, userReactiveImport: string): boolean {
   if (isCallOf(node, userReactiveImport)) {
     return true
@@ -1652,6 +1799,11 @@ function canNeverBeRef(node: Node, userReactiveImport: string): boolean {
  * Note that `compileScriptSetup` already analyzes bindings as part of its
  * compilation process so this should only be used on single `<script>` SFCs.
  */
+/**
+ * 分析脚本绑定
+ * @param ast
+ * @returns
+ */
 function analyzeScriptBindings(ast: Statement[]): BindingMetadata {
   for (const node of ast) {
     if (
@@ -1664,6 +1816,11 @@ function analyzeScriptBindings(ast: Statement[]): BindingMetadata {
   return {}
 }
 
+/**
+ * 从选项分析绑定
+ * @param node
+ * @returns
+ */
 function analyzeBindingsFromOptions(node: ObjectExpression): BindingMetadata {
   const bindings: BindingMetadata = {}
   // #3270, #3275
@@ -1740,6 +1897,11 @@ function analyzeBindingsFromOptions(node: ObjectExpression): BindingMetadata {
   return bindings
 }
 
+/**
+ * 获取对象表达式键
+ * @param node
+ * @returns
+ */
 function getObjectExpressionKeys(node: ObjectExpression): string[] {
   const keys = []
   for (const prop of node.properties) {
@@ -1757,6 +1919,11 @@ function getObjectExpressionKeys(node: ObjectExpression): string[] {
   return keys
 }
 
+/**
+ * 获取数组表达式建
+ * @param node
+ * @returns
+ */
 function getArrayExpressionKeys(node: ArrayExpression): string[] {
   const keys = []
   for (const element of node.elements) {
@@ -1767,6 +1934,11 @@ function getArrayExpressionKeys(node: ArrayExpression): string[] {
   return keys
 }
 
+/**
+ * 获取对象或数组表达式键
+ * @param value
+ * @returns
+ */
 function getObjectOrArrayExpressionKeys(value: Node): string[] {
   if (value.type === 'ArrayExpression') {
     return getArrayExpressionKeys(value)
@@ -1779,6 +1951,11 @@ function getObjectOrArrayExpressionKeys(value: Node): string[] {
 
 const templateUsageCheckCache = createCache<string>()
 
+/**
+ * 解析模板使用检查字符串
+ * @param sfc
+ * @returns
+ */
 function resolveTemplateUsageCheckString(sfc: SFCDescriptor) {
   const { content, ast } = sfc.template!
   const cached = templateUsageCheckCache.get(content)
@@ -1830,6 +2007,11 @@ function stripStrings(exp: string) {
     .replace(/`[^`]+`/g, stripTemplateString)
 }
 
+/**
+ *
+ * @param str
+ * @returns
+ */
 function stripTemplateString(str: string): string {
   const interpMatch = str.match(/\${[^}]+}/g)
   if (interpMatch) {

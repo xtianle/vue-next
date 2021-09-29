@@ -1,3 +1,8 @@
+/**
+ * 创建缓存
+ * @param size
+ * @returns
+ */
 export function createCache<T>(size = 500) {
   return __GLOBAL__ || __ESM_BROWSER__
     ? new Map<string, T>()

@@ -1,16 +1,27 @@
 import { UrlWithStringQuery, parse as uriParse } from 'url'
 import { isString } from '@vue/shared'
 
+/**
+ * 是否是相对的url
+ * @param url
+ * @returns
+ */
 export function isRelativeUrl(url: string): boolean {
   const firstChar = url.charAt(0)
   return firstChar === '.' || firstChar === '~' || firstChar === '@'
 }
 
+/**
+ * 是否外部url
+ */
 const externalRE = /^https?:\/\//
 export function isExternalUrl(url: string): boolean {
   return externalRE.test(url)
 }
 
+/**
+ * 是否是数据url
+ */
 const dataUrlRE = /^\s*data:/i
 export function isDataUrl(url: string): boolean {
   return dataUrlRE.test(url)
@@ -18,6 +29,11 @@ export function isDataUrl(url: string): boolean {
 
 /**
  * Parses string url into URL object.
+ */
+/**
+ * 解析url
+ * @param url
+ * @returns
  */
 export function parseUrl(url: string): UrlWithStringQuery {
   const firstChar = url.charAt(0)

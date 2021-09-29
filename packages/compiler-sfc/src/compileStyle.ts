@@ -67,6 +67,11 @@ export interface SFCStyleCompileResults {
   dependencies: Set<string>
 }
 
+/**
+ * 编译样式
+ * @param options
+ * @returns
+ */
 export function compileStyle(
   options: SFCStyleCompileOptions
 ): SFCStyleCompileResults {
@@ -76,6 +81,11 @@ export function compileStyle(
   }) as SFCStyleCompileResults
 }
 
+/**
+ * 异步编译样式
+ * @param options
+ * @returns
+ */
 export function compileStyleAsync(
   options: SFCAsyncStyleCompileOptions
 ): Promise<SFCStyleCompileResults> {
@@ -85,6 +95,11 @@ export function compileStyleAsync(
   }) as Promise<SFCStyleCompileResults>
 }
 
+/**
+ * 编译样式
+ * @param options
+ * @returns
+ */
 export function doCompileStyle(
   options: SFCAsyncStyleCompileOptions
 ): SFCStyleCompileResults | Promise<SFCStyleCompileResults> {
@@ -218,6 +233,12 @@ export function doCompileStyle(
   }
 }
 
+/**
+ * 预处理
+ * @param options
+ * @param preprocessor
+ * @returns
+ */
 function preprocess(
   options: SFCStyleCompileOptions,
   preprocessor: StylePreprocessor

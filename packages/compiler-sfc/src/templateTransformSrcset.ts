@@ -20,6 +20,9 @@ import {
 
 const srcsetTags = ['img', 'source']
 
+/**
+ * 候选图像
+ */
 interface ImageCandidate {
   url: string
   descriptor: string
@@ -28,6 +31,11 @@ interface ImageCandidate {
 // http://w3c.github.io/html/semantics-embedded-content.html#ref-for-image-candidate-string-5
 const escapedSpaceCharacters = /( |\\t|\\n|\\f|\\r)+/g
 
+/**
+ * 使用选项创建Srcset变换
+ * @param options
+ * @returns
+ */
 export const createSrcsetTransformWithOptions = (
   options: Required<AssetURLOptions>
 ): NodeTransform => {
