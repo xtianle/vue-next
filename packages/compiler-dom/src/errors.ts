@@ -5,10 +5,19 @@ import {
   ErrorCodes
 } from '@vue/compiler-core'
 
+/**
+ * dom编译错误
+ */
 export interface DOMCompilerError extends CompilerError {
   code: DOMErrorCodes
 }
 
+/**
+ * 创建dom编译错误
+ * @param code
+ * @param loc
+ * @returns
+ */
 export function createDOMCompilerError(
   code: DOMErrorCodes,
   loc?: SourceLocation
@@ -20,6 +29,9 @@ export function createDOMCompilerError(
   ) as DOMCompilerError
 }
 
+/**
+ * dom错误编码
+ */
 export const enum DOMErrorCodes {
   X_V_HTML_NO_EXPRESSION = ErrorCodes.__EXTEND_POINT__,
   X_V_HTML_WITH_CHILDREN,
@@ -35,6 +47,9 @@ export const enum DOMErrorCodes {
   __EXTEND_POINT__
 }
 
+/**
+ * dom错误消息
+ */
 export const DOMErrorMessages: { [code: number]: string } = {
   [DOMErrorCodes.X_V_HTML_NO_EXPRESSION]: `v-html is missing expression.`,
   [DOMErrorCodes.X_V_HTML_WITH_CHILDREN]: `v-html will override element children.`,

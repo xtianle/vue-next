@@ -16,12 +16,18 @@ const isRawTextContainer = /*#__PURE__*/ makeMap(
   true
 )
 
+/**
+ * dom命名空间
+ */
 export const enum DOMNamespaces {
   HTML = Namespaces.HTML,
   SVG,
   MATH_ML
 }
 
+/**
+ * 解析选项
+ */
 export const parserOptions: ParserOptions = {
   isVoidTag,
   isNativeTag: tag => isHTMLTag(tag) || isSVGTag(tag),

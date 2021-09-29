@@ -2,6 +2,12 @@
 
 let decoder: HTMLDivElement
 
+/**
+ * 解码浏览器html
+ * @param raw
+ * @param asAttr
+ * @returns
+ */
 export function decodeHtmlBrowser(raw: string, asAttr = false): string {
   if (!decoder) {
     decoder = document.createElement('div')

@@ -2,8 +2,15 @@ import { ParserOptions } from '@vue/compiler-core'
 import namedCharacterReferences from './namedChars.json'
 
 // lazy compute this to make this file tree-shakable for browser
+// 最大CR名称长度
 let maxCRNameLength: number
 
+/**
+ * 解码html
+ * @param rawText
+ * @param asAttr
+ * @returns
+ */
 export const decodeHtml: ParserOptions['decodeEntities'] = (
   rawText,
   asAttr
@@ -102,6 +109,7 @@ export const decodeHtml: ParserOptions['decodeEntities'] = (
 }
 
 // https://html.spec.whatwg.org/multipage/parsing.html#numeric-character-reference-end-state
+// ccr 替换
 const CCR_REPLACEMENTS: Record<number, number | undefined> = {
   0x80: 0x20ac,
   0x82: 0x201a,
